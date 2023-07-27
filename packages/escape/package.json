@@ -1,6 +1,6 @@
 {
   "name": "@weapp-core/escape",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "escape class name in weapp",
   "scripts": {
     "build": "unbuild",
