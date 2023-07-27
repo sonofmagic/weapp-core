@@ -1,6 +1,6 @@
 {
-  "name": "pnpm-turbo-monorepo-template",
-  "version": "0.0.1",
+  "name": "weapp-core",
+  "version": "0.0.0",
   "private": true,
   "workspaces": [
     "apps/*",

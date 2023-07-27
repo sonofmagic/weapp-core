@@ -45,7 +45,7 @@ importers:
         specifier: ^0.33.0
         version: 0.33.0
 
-  packages/foo: {}
+  packages/escape: {}
 
 packages:
 
