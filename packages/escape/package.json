@@ -1,6 +1,6 @@
 {
   "name": "@weapp-core/escape",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "escape class name in weapp",
   "scripts": {
     "build": "unbuild",
@@ -34,8 +34,12 @@
   },
   "author": "SonOfMagic <qq1324318532@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonofmagic/weapp-core.git"
+  },
   "bugs": {
     "url": "https://github.com/sonofmagic/weapp-core/issues"
   },
-  "homepage": "https://github.com/sonofmagic/weapp-core/packages/escape#readme"
+  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/escape#readme"
 }
