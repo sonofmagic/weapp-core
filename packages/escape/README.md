@@ -11,7 +11,7 @@
 ## Usage
 
 ```ts
-import { escape } from '@/index'
+import { escape } from '@weapp-core/escape'
 
 escape(str)
 ```
