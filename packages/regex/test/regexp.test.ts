@@ -1,4 +1,13 @@
-import { variableRegExp, createTemplateHandlerMatchRegexp, createTemplateClassRegexp, escapeStringRegexp, getSourceString, matchAll } from '@/index'
+import {
+  variableRegExp,
+  createTemplateHandlerMatchRegexp,
+  createTemplateClassRegexp,
+  escapeStringRegexp,
+  getSourceString,
+  matchAll,
+  tagWithEitherClassAndHoverClassRegexp,
+  templateClassExactRegexp
+} from '@/index'
 
 describe('regexp', () => {
   test('with var 5', () => {
@@ -54,5 +63,28 @@ describe('regexp', () => {
     expect(getSourceString(input)).toBe(input.source)
     input = {}
     expect(getSourceString(input)).toBe(Object.prototype.toString.call(input))
+  })
+
+  it('tagWithEitherClassAndHoverClassRegexp case 0', () => {
+    const res = matchAll(
+      tagWithEitherClassAndHoverClassRegexp,
+      `<view wx:if="{{xxx}}" class="ml-[16px]"><view class="ml-[16px]" wx:if="{{xxx}}"></view>
+      <view></view>
+
+
+      <text hover-class="m-[6px]" class="ml-[13px]"></text></view>`
+    )
+    expect(res.length).toBe(3)
+    expect(res[0][0]).toBe('<view wx:if="{{xxx}}" class="ml-[16px]">')
+    expect(res[1][0]).toBe('<view class="ml-[16px]" wx:if="{{xxx}}">')
+    expect(res[2][0]).toBe('<text hover-class="m-[6px]" class="ml-[13px]">')
+    const classTokens: RegExpExecArray[][] = []
+    for (const re of res) {
+      classTokens.push(matchAll(templateClassExactRegexp, re[0]))
+    }
+    expect(classTokens.length).toBe(3)
+    expect(classTokens[0].length).toBe(1)
+    expect(classTokens[1].length).toBe(1)
+    expect(classTokens[2].length).toBe(2)
   })
 })
