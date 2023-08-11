@@ -62,14 +62,6 @@ export function escape(
       }
     }
   }
-  const res = sb.join('')
-  return res
-  // res = stringbuilder.join('')
 
-  // for (let i = 0; i < entries.length; i++) {
-  //   const [searchValue, replaceValue] = entries[i]
-
-  //   res = res.replace(new RegExp((raw ? '\\\\' : '') + escapeStringRegexp(searchValue), 'g'), replaceValue)
-  // }
-  // return res
+  return sb.join('')
 }

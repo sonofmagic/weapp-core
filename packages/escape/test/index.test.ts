@@ -1,4 +1,4 @@
-import { MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries, isAsciiNumber, escape } from '@/index'
+import { MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries, isAsciiNumber, escape, jsStringEscape } from '@/index'
 
 const testCase = `1234567890-=\b~!@#$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?`
 describe('index', () => {
@@ -39,5 +39,34 @@ describe('index', () => {
   it('escape with map', () => {
     const res = escape(testCase, { map: MappingChars2String })
     expect(res).toMatchSnapshot()
+  })
+
+  it('exports from @ast-core/escape', () => {
+    expect(jsStringEscape).toBeDefined()
+  })
+
+  it('MAX_ASCII_CHAR_CODE', () => {
+    const res = escape('我爱你')
+    expect(res).toBe('u6211u7231u4f60')
+  })
+
+  it('-', () => {
+    const res = escape('-')
+    expect(res).toBe('_-')
+  })
+
+  it('-number', () => {
+    const res = escape('-12345')
+    expect(res).toBe('_-12345')
+  })
+
+  it('-string', () => {
+    const res = escape('-plmkoi')
+    expect(res).toBe('-plmkoi')
+  })
+
+  it('-string 0', () => {
+    const res = escape('-aplmkoi')
+    expect(res).toBe('-aplmkoi')
   })
 })
