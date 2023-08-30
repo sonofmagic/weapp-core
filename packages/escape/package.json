@@ -1,6 +1,6 @@
 {
   "name": "@weapp-core/escape",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "escape class name in weapp",
   "scripts": {
     "build": "unbuild",
@@ -42,7 +42,5 @@
     "url": "https://github.com/sonofmagic/weapp-core/issues"
   },
   "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/escape#readme",
-  "dependencies": {
-    "@ast-core/escape": "^1.0.0"
-  }
+  "dependencies": {}
 }

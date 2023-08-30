@@ -1,6 +1,6 @@
 {
   "name": "@weapp-core/regex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "weapp regex utils",
   "scripts": {
     "build": "unbuild",

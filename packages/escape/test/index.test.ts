@@ -1,4 +1,4 @@
-import { MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries, isAsciiNumber, escape, jsStringEscape } from '@/index'
+import { MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries, isAsciiNumber, escape } from '@/index'
 
 const testCase = `1234567890-=\b~!@#$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?`
 describe('index', () => {
@@ -41,9 +41,7 @@ describe('index', () => {
     expect(res).toMatchSnapshot()
   })
 
-  it('exports from @ast-core/escape', () => {
-    expect(jsStringEscape).toBeDefined()
-  })
+
 
   it('MAX_ASCII_CHAR_CODE', () => {
     const res = escape('我爱你')
