@@ -51,11 +51,7 @@ importers:
         specifier: ^0.34.3
         version: 0.34.3
 
-  packages/escape:
-    dependencies:
-      '@ast-core/escape':
-        specifier: ^1.0.0
-        version: 1.0.0
+  packages/escape: {}
 
   packages/regex: {}
 
@@ -73,10 +69,6 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.19
     dev: true
-
-  /@ast-core/escape@1.0.0:
-    resolution: {integrity: sha512-fK2+alQGwz8lgQ1V8hrV7Fe+z6BMptFPwEiJC2nF1tjetD6bK9+fLaKUn/Shft7cnKf3PefLBFKE1Qf7ZfL+5A==}
-    dev: false
 
   /@babel/code-frame@7.22.10:
     resolution: {integrity: sha512-/KKIMG4UEL35WmI9OlvMhurwtytjvXoFcGNrOvyG9zIzA8YmPjVtIZUf7b05+TPO7G7/GEmLHDaoCgACHl9hhA==}
