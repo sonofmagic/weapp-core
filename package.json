@@ -18,10 +18,10 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
-    "@vitest/coverage-v8": "^0.34.3",
+    "@vitest/coverage-v8": "^0.34.4",
     "@weapp-core/escape": "workspace:^",
     "@weapp-core/regex": "workspace:^",
-    "eslint": "^8.48.0",
+    "eslint": "^8.49.0",
     "eslint-config-icebreaker": "^1.2.2",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
@@ -30,7 +30,8 @@
     "turbo": "^1.10.13",
     "typescript": "^5.2.2",
     "unbuild": "^2.0.0",
-    "vitest": "^0.34.3"
+    "vitest": "^0.34.4",
+    "miniprogram-api-typings": "^3.12.0"
   },
   "engines": {
     "node": ">=16.0.0"
@@ -43,5 +44,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sonofmagic/weapp-core.git"
-  }
+  },
+  "dependencies": {}
 }
