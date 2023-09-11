@@ -1,5 +1,4 @@
-import { Event, EventTarget } from 'event-target-shim'
-import { isFunction, isString } from './shared'
+import { Event, EventTarget, getEventAttributeValue, setEventAttributeValue } from 'event-target-shim'
 
 const SUPPORT_METHOD = new Set(['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'])
 const STATUS_TEXT_MAP: Record<string, string> = {
@@ -48,44 +47,35 @@ const STATUS_TEXT_MAP: Record<string, string> = {
   504: 'Gateway Timeout',
   505: 'HTTP Version Not Supported'
 }
+// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#events
+export type EventSourceEventMap = {
+  abort: XMLHttpRequestEvent<'abort'>
+  error: XMLHttpRequestEvent<'error'>
+  load: XMLHttpRequestEvent<'load'>
+  loadend: XMLHttpRequestEvent<'loadend'>
+  loadstart: XMLHttpRequestEvent<'loadstart'>
+  progress: XMLHttpRequestEvent<'progress'>
+  readystatechange: XMLHttpRequestEvent<'readystatechange'>
+  timeout: XMLHttpRequestEvent<'timeout'>
+}
 
-export interface XMLHttpRequestEvent extends Event {
-  target: XMLHttpRequest
-  currentTarget: XMLHttpRequest
+export class XMLHttpRequestEvent<TEventType extends keyof EventSourceEventMap> extends Event<TEventType> {
   loaded: number
   total: number
+  constructor(type: TEventType, eventInitDict?: Event.EventInit | undefined) {
+    super(type, eventInitDict)
+    this.loaded = 0
+    this.total = 0
+  }
 }
 
-export function createXMLHttpRequestEvent(event: string, target: XMLHttpRequest, loaded: number): XMLHttpRequestEvent {
-  const e = new Event(event) as XMLHttpRequestEvent
-  try {
-    Object.defineProperties(e, {
-      currentTarget: {
-        enumerable: true,
-        value: target
-      },
-      target: {
-        enumerable: true,
-        value: target
-      },
-      loaded: {
-        enumerable: true,
-        value: loaded || 0
-      },
-      // 读 Content-Range 字段，目前来说作用不大,先和 loaded 保持一致
-      total: {
-        enumerable: true,
-        value: loaded || 0
-      }
-    })
-  } catch {
-    // no handler
-  }
+export function createXMLHttpRequestEvent(event: keyof EventSourceEventMap, loaded: number) {
+  const e = new XMLHttpRequestEvent(event)
+  e.loaded = loaded
   return e
 }
-
 // https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest
-export class XMLHttpRequest extends EventTarget {
+export class XMLHttpRequest extends EventTarget<EventSourceEventMap, 'strict'> {
   static readonly UNSENT = 0
   static readonly OPENED = 1
   static readonly HEADERS_RECEIVED = 2
@@ -113,35 +103,74 @@ export class XMLHttpRequest extends EventTarget {
   #response: null
   #timeout: number
   #withCredentials: boolean
-  #requestTask: null | any
+  #requestTask: null | WechatMiniprogram.RequestTask
+  #requestMethod: WechatMiniprogram.Wx['request']
 
-  // 事件正常流转： loadstart => progress（可能多次） => load => loadend
-  // error 流转： loadstart => error => loadend
-  // abort 流转： loadstart => abort => loadend
-  // web在线测试： https://developer.mozilla.org/zh-CN/play
+  get onabort() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['abort']>(this, 'abort')
+  }
 
-  /** 当 request 被停止时触发，例如当程序调用 XMLHttpRequest.abort() 时 */
-  onabort: ((e: XMLHttpRequestEvent) => void) | null = null
+  set onabort(value) {
+    setEventAttributeValue(this, 'abort', value)
+  }
 
-  /** 当 request 遭遇错误时触发 */
-  onerror: ((e: XMLHttpRequestEvent) => void) | null = null
+  get onerror() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['error']>(this, 'error')
+  }
 
-  /** 接收到响应数据时触发 */
-  onloadstart: ((e: XMLHttpRequestEvent) => void) | null = null
+  set onerror(value) {
+    setEventAttributeValue(this, 'error', value)
+  }
 
-  /** 请求成功完成时触发 */
-  onload: ((e: XMLHttpRequestEvent) => void) | null = null
+  get onload() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['load']>(this, 'load')
+  }
 
-  /** 当请求结束时触发，无论请求成功 ( load) 还是失败 (abort 或 error)。 */
-  onloadend: ((e: XMLHttpRequestEvent) => void) | null = null
+  set onload(value) {
+    setEventAttributeValue(this, 'load', value)
+  }
 
-  /** 在预设时间内没有接收到响应时触发 */
-  ontimeout: ((e: XMLHttpRequestEvent) => void) | null = null
+  get onloadend() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['loadend']>(this, 'loadend')
+  }
 
-  /** 当 readyState 属性发生变化时，调用的事件处理器 */
-  onreadystatechange: ((e: XMLHttpRequestEvent) => void) | null = null
+  set onloadend(value) {
+    setEventAttributeValue(this, 'loadend', value)
+  }
 
-  constructor() {
+  get onloadstart() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['loadstart']>(this, 'loadstart')
+  }
+
+  set onloadstart(value) {
+    setEventAttributeValue(this, 'loadstart', value)
+  }
+
+  get onprogress() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['progress']>(this, 'progress')
+  }
+
+  set onprogress(value) {
+    setEventAttributeValue(this, 'progress', value)
+  }
+
+  get onreadystatechange() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['readystatechange']>(this, 'readystatechange')
+  }
+
+  set onreadystatechange(value) {
+    setEventAttributeValue(this, 'readystatechange', value)
+  }
+
+  get ontimeout() {
+    return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['timeout']>(this, 'timeout')
+  }
+
+  set ontimeout(value) {
+    setEventAttributeValue(this, 'timeout', value)
+  }
+
+  constructor(requestMethod = wx.request) {
     super()
 
     this.#method = ''
@@ -161,16 +190,7 @@ export class XMLHttpRequest extends EventTarget {
     this.#withCredentials = true
 
     this.#requestTask = null
-  }
-
-  addEventListener(event: string, callback: (arg: any) => void) {
-    if (!isString(event)) return
-    super.addEventListener(event, callback)
-  }
-
-  removeEventListener(event: string, callback: (arg: any) => void) {
-    if (!isString(event)) return
-    super.removeEventListener(event, callback)
+    this.#requestMethod = requestMethod
   }
 
   /**
@@ -181,10 +201,8 @@ export class XMLHttpRequest extends EventTarget {
     this.#readyState = readyState
 
     if (hasChange) {
-      const readystatechangeEvent = createXMLHttpRequestEvent('readystatechange', this, 0)
+      const readystatechangeEvent = createXMLHttpRequestEvent('readystatechange', 0)
       this.dispatchEvent(readystatechangeEvent)
-
-      isFunction(this.onreadystatechange) && this.onreadystatechange(readystatechangeEvent)
     }
   }
 
@@ -205,9 +223,8 @@ export class XMLHttpRequest extends EventTarget {
           // 超时
           if (this.#requestTask) this.#requestTask.abort()
           this.#callReadyStateChange(XMLHttpRequest.DONE)
-          const timeoutEvent = createXMLHttpRequestEvent('timeout', this, 0)
+          const timeoutEvent = createXMLHttpRequestEvent('timeout', 0)
           this.dispatchEvent(timeoutEvent)
-          isFunction(this.ontimeout) && this.ontimeout(timeoutEvent)
         }
       }, this.#timeout)
     }
@@ -232,7 +249,7 @@ export class XMLHttpRequest extends EventTarget {
     //   const { origin } = parseUrl(url)
     //   if (origin !== window.location.origin) delete header.cookie
     // }
-    this.#requestTask = wx.request({
+    this.#requestTask = this.#requestMethod({
       url,
       data: this.#data || {},
       header,
@@ -266,14 +283,13 @@ export class XMLHttpRequest extends EventTarget {
     // 处理返回数据
     if (data) {
       this.#callReadyStateChange(XMLHttpRequest.LOADING)
-      const loadstartEvent = createXMLHttpRequestEvent('loadstart', this, header['Content-Length'])
+      const loadstartEvent = createXMLHttpRequestEvent('loadstart', header['Content-Length'])
       this.dispatchEvent(loadstartEvent)
-      isFunction(this.onloadstart) && this.onloadstart(loadstartEvent)
+
       this.#response = data
 
-      const loadEvent = createXMLHttpRequestEvent('load', this, header['Content-Length'])
+      const loadEvent = createXMLHttpRequestEvent('load', header['Content-Length'])
       this.dispatchEvent(loadEvent)
-      isFunction(this.onload) && this.onload(loadEvent)
     }
   }
 
@@ -291,9 +307,8 @@ export class XMLHttpRequest extends EventTarget {
     }
     this.#status = 0
     this.#statusText = err.errMsg || err.errorMessage
-    const errorEvent = createXMLHttpRequestEvent('error', this, 0)
+    const errorEvent = createXMLHttpRequestEvent('error', 0)
     this.dispatchEvent(errorEvent)
-    isFunction(this.onerror) && this.onerror(errorEvent)
   }
 
   /**
@@ -304,9 +319,8 @@ export class XMLHttpRequest extends EventTarget {
     this.#callReadyStateChange(XMLHttpRequest.DONE)
 
     if (this.#status) {
-      const loadendEvent = createXMLHttpRequestEvent('loadend', this, this.#header['Content-Length'])
+      const loadendEvent = createXMLHttpRequestEvent('loadend', this.#header['Content-Length'])
       this.dispatchEvent(loadendEvent)
-      isFunction(this.onloadend) && this.onloadend(loadendEvent)
     }
   }
 
@@ -370,9 +384,8 @@ export class XMLHttpRequest extends EventTarget {
   abort() {
     if (this.#requestTask) {
       this.#requestTask.abort()
-      const abortEvent = createXMLHttpRequestEvent('abort', this, 0)
+      const abortEvent = createXMLHttpRequestEvent('abort', 0)
       this.dispatchEvent(abortEvent)
-      isFunction(this.onabort) && this.onabort(abortEvent)
     }
   }
 
@@ -412,7 +425,7 @@ export class XMLHttpRequest extends EventTarget {
     }
   }
 
-  send(data: any) {
+  send(data?: any) {
     if (this.#readyState !== XMLHttpRequest.OPENED) return
 
     this.#data = data

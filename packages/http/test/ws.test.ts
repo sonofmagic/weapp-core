@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/prefer-add-event-listener */
 
 import { WeappWebSocket, WeappWebSocketEvent } from '@/index'
+import { WeappWebSocketTask } from '@/ws'
 const defaultMockOptions = {
   message: 'onMessage',
   errMsg: 'onError',
@@ -16,8 +17,13 @@ function createMockTask(
     code: number
     reason: string
   } = defaultMockOptions
-): WechatMiniprogram.SocketTask {
+): WeappWebSocketTask {
   return {
+    CONNECTING: 0,
+    OPEN: 1,
+    CLOSING: 2,
+    CLOSED: 3,
+    readyState: 0,
     close(opt) {
       opt.success?.({
         errMsg: 'ok'
@@ -25,7 +31,7 @@ function createMockTask(
     },
     send(opt) {
       opt.success?.({
-        errMsg: 'ok'
+        errMsg: opt.data.toString()
       })
     },
     onClose(fn) {
@@ -111,6 +117,8 @@ describe('[Default]', () => {
     ws.onopen = () => {
       result.push(4)
     }
+    expect(ws.onopen).toBeDefined()
+    expect(typeof ws.onopen === 'function').toBe(true)
 
     ws.dispatchEvent(
       new WeappWebSocketEvent('open', {
@@ -149,7 +157,8 @@ describe('[Default]', () => {
     ws.onclose = () => {
       result.push(4)
     }
-
+    expect(ws.onclose).toBeDefined()
+    expect(typeof ws.onclose === 'function').toBe(true)
     ws.dispatchEvent(
       new WeappWebSocketEvent('close', {
         code: 1,
@@ -178,7 +187,8 @@ describe('[Default]', () => {
     ws.onerror = () => {
       result.push(4)
     }
-
+    expect(ws.onerror).toBeDefined()
+    expect(typeof ws.onerror === 'function').toBe(true)
     ws.dispatchEvent(
       new WeappWebSocketEvent('error', {
         errMsg: '1234'
@@ -191,6 +201,7 @@ describe('[Default]', () => {
   test('message invoke sequnce', () => {
     const result: number[] = []
     const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql', ['graphql-ws'], {}, createMockTask)
+    let d: string
     ws.addEventListener('message', function () {
       result.push(1)
     })
@@ -203,9 +214,12 @@ describe('[Default]', () => {
       result.push(3)
     })
 
-    ws.onmessage = () => {
+    ws.onmessage = (e) => {
       result.push(4)
+      d = e.value.data as string
     }
+    expect(ws.onmessage).toBeDefined()
+    expect(typeof ws.onmessage === 'function').toBe(true)
 
     ws.dispatchEvent(
       new WeappWebSocketEvent('message', {
@@ -214,5 +228,37 @@ describe('[Default]', () => {
     )
 
     expect(result).toEqual([1, 2, 3, 4])
+    // @ts-ignore
+    expect(d).toBe('1234')
+  })
+
+  it('send msg', async () => {
+    const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql', [], {}, createMockTask)
+    const sendText = '1111'
+    const res = await ws.send(sendText)
+    expect(res.errMsg).toBe(sendText)
+  })
+
+  it('readyState init get CONNECTING(0)', () => {
+    const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql', [], {}, createMockTask)
+    // mock task run all fn
+    expect(ws.readyState).toBe(3)
+  })
+
+  it('WeappWebSocket options case 0', () => {
+    const opt = { timeout: 1 }
+    const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql', [], opt, createMockTask)
+    // mock task run all fn
+    expect(ws.params).toEqual({
+      ...opt,
+      url: 'ws://127.0.0.1:3000/graphql',
+      protocols: []
+    })
+  })
+
+  it('close method', async () => {
+    const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql', [], {}, createMockTask)
+    const { errMsg } = await ws.close()
+    expect(errMsg).toBe('ok')
   })
 })

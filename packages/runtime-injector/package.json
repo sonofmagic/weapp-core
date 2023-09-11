@@ -1,0 +1,36 @@
+{
+  "name": "@weapp-core/runtime-injector",
+  "version": "0.0.0",
+  "description": "runtime-injector",
+  "scripts": {
+    "build": "unbuild",
+    "test": "vitest run",
+    "test:dev": "vitest",
+    "release": "pnpm publish"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "dependencies": {
+    "unplugin": "^1.4.0"
+  }
+}

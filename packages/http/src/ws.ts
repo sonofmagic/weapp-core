@@ -9,10 +9,11 @@ const CLOSING = 2 as const
 const CLOSED = 3 as const
 
 export type WeappWebSocketTask = WechatMiniprogram.SocketTask & {
-  readyState: number
-  CLOSED: number
-  CLOSING: number
-  OPEN: number
+  readyState: 0 | 1 | 2 | 3
+  CONNECTING: 0
+  OPEN: 1
+  CLOSING: 2
+  CLOSED: 3
 }
 
 export class WeappWebSocketEvent<TEventType extends string, TRes> extends Event<TEventType> {
@@ -60,7 +61,7 @@ export class WeappWebSocket extends EventTarget<EventSourceEventMap, 'strict'> {
 
   // https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/url
   readonly url: string
-
+  readonly params: WechatMiniprogram.ConnectSocketOption
   constructor(
     url: string | URL,
     protocols?: string | string[],
@@ -70,7 +71,7 @@ export class WeappWebSocket extends EventTarget<EventSourceEventMap, 'strict'> {
     super()
     this.url = typeof url === 'string' ? url : url.toString()
 
-    const params: WechatMiniprogram.ConnectSocketOption = {
+    const params = {
       url: this.url,
       protocols: typeof protocols === 'string' ? [protocols] : protocols
     }
@@ -80,18 +81,21 @@ export class WeappWebSocket extends EventTarget<EventSourceEventMap, 'strict'> {
         params[k] = options[k]
       }
     }
-    this.task = connectSocket(params) as WeappWebSocketTask
+    this.params = params
+    this.task = connectSocket(this.params) as WeappWebSocketTask
 
     this.task.onOpen((result: WechatMiniprogram.OnOpenListenerResult) => {
       const e = new WeappWebSocketEvent('open', result)
 
       this.dispatchEvent(e)
+      this.task.readyState = OPEN
     })
 
     this.task.onError((result: WechatMiniprogram.GeneralCallbackResult) => {
       const e = new WeappWebSocketEvent('error', result)
 
       this.dispatchEvent(e)
+      //  this.task.readyState = this.task.OPEN
     })
 
     this.task.onMessage((result: WechatMiniprogram.SocketTaskOnMessageListenerResult) => {
@@ -104,6 +108,7 @@ export class WeappWebSocket extends EventTarget<EventSourceEventMap, 'strict'> {
       const e = new WeappWebSocketEvent('close', result)
 
       this.dispatchEvent(e)
+      this.task.readyState = CLOSED
     })
   }
 
