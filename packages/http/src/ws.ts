@@ -175,4 +175,12 @@ export class WeappWebSocket extends EventTarget<EventSourceEventMap, 'strict'> {
       })
     })
   }
+
+  static toString() {
+    return 'function WebSocket() { [native code] }'
+  }
+
+  toString() {
+    return '[object WebSocket]'
+  }
 }
