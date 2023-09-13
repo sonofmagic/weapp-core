@@ -150,6 +150,12 @@ importers:
 
   packages/escape: {}
 
+  packages/fetch:
+    dependencies:
+      '@weapp-core/http':
+        specifier: workspace:^
+        version: link:../http
+
   packages/http:
     devDependencies:
       axios:

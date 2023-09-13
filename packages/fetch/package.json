@@ -1,6 +1,7 @@
 {
   "name": "weapp-fetch",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "private": true,
   "description": "fetch in weapp",
   "scripts": {
     "build": "unbuild",
@@ -34,5 +35,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@weapp-core/http": "workspace:^"
+  }
 }

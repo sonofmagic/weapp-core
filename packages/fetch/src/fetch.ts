@@ -1,4 +1,6 @@
+/* eslint-disable no-new */
 /* eslint-disable no-prototype-builtins */
+import type { IHeaders, IRequest, IResponse } from './type'
 const g =
   (typeof globalThis !== 'undefined' && globalThis) ||
   (typeof self !== 'undefined' && self) ||
@@ -6,7 +8,7 @@ const g =
   (typeof global !== 'undefined' && global) ||
   {}
 
-const support = {
+export const support = {
   searchParams: 'URLSearchParams' in g,
   iterable: 'Symbol' in g && 'iterator' in Symbol,
   blob:
@@ -48,7 +50,7 @@ if (support.arrayBuffer) {
     }
 }
 
-function normalizeName(name) {
+export function normalizeName(name) {
   if (typeof name !== 'string') {
     name = String(name)
   }
@@ -58,7 +60,7 @@ function normalizeName(name) {
   return name.toLowerCase()
 }
 
-function normalizeValue(value) {
+export function normalizeValue(value) {
   if (typeof value !== 'string') {
     value = String(value)
   }
@@ -83,7 +85,7 @@ function iteratorFor(items) {
   return iterator
 }
 
-export function Headers(headers) {
+export function Headers(this: IHeaders, headers) {
   this.map = {}
 
   if (headers instanceof Headers) {
@@ -423,7 +425,7 @@ function decode(body) {
   return form
 }
 
-function parseHeaders(rawHeaders) {
+export function parseHeaders(rawHeaders) {
   const headers = new Headers()
   // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
   // https://tools.ietf.org/html/rfc7230#section-3.2
