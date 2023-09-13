@@ -7,3 +7,11 @@
 [@weapp-core/escape](./packages/escape)
 
 [@weapp-core/regex](./packages/regex)
+
+[@weapp-core/http](./packages/http)
+
+[@weapp-core/runtime-injector](./packages/runtime-injector)
+
+[weapp-websocket](./packages/websocket)
+
+[weapp-xmlhttprequest](./packages/runtime-injector)

@@ -13,7 +13,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "release": "turbo run release",
-    "publish-packages": "turbo run build lint test && changeset version && changeset publish",
+    "publish-packages": "turbo run build lint && npm run test && changeset version && changeset publish",
     "sync": "cnpm sync @weapp-core/escape @weapp-core/regex"
   },
   "devDependencies": {
