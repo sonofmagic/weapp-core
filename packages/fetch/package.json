@@ -1,0 +1,38 @@
+{
+  "name": "weapp-fetch",
+  "version": "0.0.0",
+  "description": "fetch in weapp",
+  "scripts": {
+    "build": "unbuild",
+    "test": "vitest run",
+    "test:dev": "vitest",
+    "release": "pnpm publish"
+  },
+  "keywords": [
+    "weapp",
+    "weapp-fetch",
+    "fetch"
+  ],
+  "author": "SonOfMagic <qq1324318532@gmail.com>",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "dependencies": {}
+}

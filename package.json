@@ -14,7 +14,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "release": "turbo run release",
     "publish-packages": "turbo run build lint && npm run test && changeset version && changeset publish",
-    "sync": "cnpm sync @weapp-core/escape @weapp-core/regex"
+    "sync": "cnpm sync @weapp-core/escape @weapp-core/regex @weapp-core/http @weapp-core/runtime-injector weapp-websocket weapp-xmlhttprequest"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
