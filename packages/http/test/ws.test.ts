@@ -1,7 +1,6 @@
 /* eslint-disable unicorn/prefer-add-event-listener */
 
-import { WeappWebSocket, WeappWebSocketEvent } from '@/index'
-import { WeappWebSocketTask } from '@/ws'
+import { WeappWebSocketTask, WeappWebSocket, WeappWebSocketEvent } from '@/ws'
 const defaultMockOptions = {
   message: 'onMessage',
   errMsg: 'onError',
@@ -260,5 +259,13 @@ describe('[Default]', () => {
     const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql', [], {}, createMockTask)
     const { errMsg } = await ws.close()
     expect(errMsg).toBe('ok')
+  })
+
+  it('toString', () => {
+    expect(WeappWebSocket.toString).toBeDefined()
+    expect(WeappWebSocket.toString()).toBe('function WebSocket() { [native code] }')
+    const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql', [], {}, createMockTask)
+    expect(ws.toString).toBeDefined()
+    expect(ws.toString()).toBe('[object WebSocket]')
   })
 })

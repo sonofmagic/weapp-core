@@ -81,8 +81,12 @@ export class XMLHttpRequest extends EventTarget<EventSourceEventMap, 'strict'> {
   static readonly HEADERS_RECEIVED = 2
   static readonly LOADING = 3
   static readonly DONE = 4
+  readonly UNSENT = 0
+  readonly OPENED = 1
+  readonly HEADERS_RECEIVED = 2
+  readonly LOADING = 3
+  readonly DONE = 4
 
-  // 欺骗一些库让其认为是原生的xhr
   static toString() {
     return 'function XMLHttpRequest() { [native code] }'
   }
