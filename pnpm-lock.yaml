@@ -173,6 +173,12 @@ importers:
         specifier: workspace:^
         version: link:../http
 
+  packages/xmlhttprequest:
+    dependencies:
+      '@weapp-core/http':
+        specifier: workspace:^
+        version: link:../http
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:
