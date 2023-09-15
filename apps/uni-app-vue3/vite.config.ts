@@ -7,9 +7,9 @@ import resolve from '@rollup/plugin-node-resolve'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    uni(),
+    uni()
     // @ts-ignore
-    resolve(),
+    // resolve(),
     // @ts-ignore
     // replace({
     //   values: {
@@ -19,16 +19,16 @@ export default defineConfig({
     //   preventAssignment: true
     // }),
     // @ts-ignore
-    inject({
-      // include: ['engine.io-client'], // , '**/*.{vue,js,ts}'
-      modules: {
-        XMLHttpRequest: ['@weapp-core/http', 'XMLHttpRequest'],
-        WebSocket: ['@weapp-core/http', 'WebSocket'],
-        window: [path.resolve('src/shims.js'), 'window'],
-        self: [path.resolve('src/shims.js'), 'self']
-        // window:'globalThis'
-      }
-    })
+    // inject({
+    //   // include: ['engine.io-client'], // , '**/*.{vue,js,ts}'
+    //   modules: {
+    //     XMLHttpRequest: ['@weapp-core/http', 'XMLHttpRequest'],
+    //     WebSocket: ['@weapp-core/http', 'WebSocket'],
+    //     window: [path.resolve('src/shims.js'), 'window'],
+    //     self: [path.resolve('src/shims.js'), 'self']
+    //     // window:'globalThis'
+    //   }
+    // })
   ]
   // build: {
   //   rollupOptions: {
