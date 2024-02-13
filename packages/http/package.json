@@ -44,7 +44,7 @@
   },
   "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/regex#readme",
   "devDependencies": {
-    "axios": "^1.6.1",
+    "axios": "^1.6.7",
     "event-target-shim": "^6.0.2"
   }
 }
