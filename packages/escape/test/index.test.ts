@@ -1,4 +1,4 @@
-import { MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries, isAsciiNumber, escape } from '@/index'
+import { MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries, escape, isAsciiNumber } from '@/index'
 
 const testCase = `1234567890-=\b~!@#$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?`
 describe('index', () => {
@@ -21,7 +21,7 @@ describe('index', () => {
   })
 
   it('not AsciiNumber', () => {
-    for (const char of "qwertyuiop[]asdfghjkl;'zxcvbnm,./=-") {
+    for (const char of 'qwertyuiop[]asdfghjkl;\'zxcvbnm,./=-') {
       const num = char.codePointAt(0)
       if (num) {
         const res = isAsciiNumber(num)
@@ -41,9 +41,7 @@ describe('index', () => {
     expect(res).toMatchSnapshot()
   })
 
-
-
-  it('MAX_ASCII_CHAR_CODE', () => {
+  it('mAX_ASCII_CHAR_CODE', () => {
     const res = escape('我爱你')
     expect(res).toBe('u6211u7231u4f60')
   })
@@ -53,9 +51,19 @@ describe('index', () => {
     expect(res).toBe('_-')
   })
 
+  it('- ignoreHead', () => {
+    const res = escape('-', { ignoreHead: true })
+    expect(res).toBe('-')
+  })
+
   it('-number', () => {
     const res = escape('-12345')
     expect(res).toBe('_-12345')
+  })
+
+  it('-number ignoreHead', () => {
+    const res = escape('-12345', { ignoreHead: true })
+    expect(res).toBe('-12345')
   })
 
   it('-string', () => {
@@ -63,8 +71,18 @@ describe('index', () => {
     expect(res).toBe('-plmkoi')
   })
 
+  it('-string ignoreHead', () => {
+    const res = escape('-plmkoi', { ignoreHead: true })
+    expect(res).toBe('-plmkoi')
+  })
+
   it('-string 0', () => {
     const res = escape('-aplmkoi')
+    expect(res).toBe('-aplmkoi')
+  })
+
+  it('-string 0 ignoreHead', () => {
+    const res = escape('-aplmkoi', { ignoreHead: true })
     expect(res).toBe('-aplmkoi')
   })
 })

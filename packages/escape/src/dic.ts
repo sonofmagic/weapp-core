@@ -21,7 +21,7 @@ export const SYMBOL_TABLE = {
   BRACERIGHT: '}',
   SEMICOLON: ';',
   COLON: ':',
-  QUOTE: "'",
+  QUOTE: '\'',
   DOUBLEQUOTE: '"',
   BACKSLASH: '\\',
   BAR: '|',
@@ -33,7 +33,7 @@ export const SYMBOL_TABLE = {
   QUESTION: '?',
   SPACE: ' ',
   DOT: '.',
-  HASH: '#'
+  HASH: '#',
 } as const
 
 export type SYMBOL_TABLE_TYPE = typeof SYMBOL_TABLE
@@ -55,7 +55,7 @@ export const MappingChars2String: MappingStringDictionary = {
   ':': '_c_',
   '%': '_p_',
   ',': '_co_',
-  "'": '_q_',
+  '\'': '_q_',
   '"': '_dq_',
   '*': '_a_',
   '&': '_am_',
@@ -74,7 +74,7 @@ export const MappingChars2String: MappingStringDictionary = {
   '^': '_ca_',
   '`': '_bq_',
   '|': '_b_',
-  $: '_do_'
+  '$': '_do_',
   // _: '_u_'
 } as const
 
@@ -86,45 +86,45 @@ export const MappingChars2StringEntries = Object.entries(MappingChars2String)
 // 同样一条 decl 你可以写 px 也可以写 PX
 // 0-31 48-57(0-9数字字符) 65-90(大写英文) 97-122(小写英文) 127(DEL)不考虑
 // #region 32-47 count:16
-// 32	20	space // 其实可以忽略空格
-// 33	21	! ✔
-// 34	22	" ✔
-// 35	23	# ✔
-// 36	24	$ ✔
-// 37	25	% ✔
-// 38	26	& ✔
-// 39	27	' ✔
-// 40	28	( ✔
-// 41	29	) ✔
-// 42	2A	* ✔
-// 43	2B	+ ✔
-// 44	2C	, ✔
-// 45	2D	- //小程序中允许，但是不能单独放在前后第一位-
-// 46	2E	. ✔
-// 47	2F	/ ✔
+// 32 20 space // 其实可以忽略空格
+// 33 21 ! ✔
+// 34 22 " ✔
+// 35 23 # ✔
+// 36 24 $ ✔
+// 37 25 % ✔
+// 38 26 & ✔
+// 39 27 ' ✔
+// 40 28 ( ✔
+// 41 29 ) ✔
+// 42 2A * ✔
+// 43 2B + ✔
+// 44 2C , ✔
+// 45 2D - //小程序中允许，但是不能单独放在前后第一位-
+// 46 2E . ✔
+// 47 2F / ✔
 // #endregion
 // #region 58-64 count:7 ✔
-// 58	3A	: ✔
-// 59	3B	; ✔
-// 60	3C	< ✔
-// 61	3D	= ✔
-// 62	3E	> ✔
-// 63	3F	? ✔
-// 64	40	@ ✔
+// 58 3A : ✔
+// 59 3B ; ✔
+// 60 3C < ✔
+// 61 3D = ✔
+// 62 3E > ✔
+// 63 3F ? ✔
+// 64 40 @ ✔
 // #endregion
 // #region 91-96 count:6 ✔
-// 91	5B	[ ✔
-// 92	5C	\ ✔
-// 93	5D	] ✔
-// 94	5E	^ ✔
-// 95	5F	_ // 小程序中合法
-// 96	60	` ✔
+// 91 5B [ ✔
+// 92 5C \ ✔
+// 93 5D ] ✔
+// 94 5E ^ ✔
+// 95 5F _ // 小程序中合法
+// 96 60 ` ✔
 // #endregion
 // #region 123-126 count:4 ✔
-// 123	7B	{ ✔
-// 124	7C	| ✔
-// 125	7D	} ✔
-// 126	7E	~ ✔
+// 123 7B { ✔
+// 124 7C | ✔
+// 125 7D } ✔
+// 126 7E ~ ✔
 // #endregion
 // 15 + 7 + 6 + 4 = 32
 export const SimpleMappingChars2String: MappingStringDictionary = {
@@ -150,14 +150,14 @@ export const SimpleMappingChars2String: MappingStringDictionary = {
   '&': 'n',
   '?': 'o',
   '%': 'p',
-  "'": 'q',
-  $: 'r',
+  '\'': 'q',
+  '$': 'r',
   '/': 's',
   '~': 't',
   '|': 'u',
   '`': 'v',
   '\\': 'w',
-  '"': 'x'
+  '"': 'x',
 }
 
 export const SimpleMappingChars2StringEntries = Object.entries(SimpleMappingChars2String)

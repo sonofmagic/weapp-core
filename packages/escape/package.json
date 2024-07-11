@@ -1,12 +1,17 @@
 {
   "name": "@weapp-core/escape",
-  "version": "2.0.0",
+  "type": "commonjs",
+  "version": "2.1.0",
   "description": "escape class name in weapp",
-  "scripts": {
-    "build": "unbuild",
-    "test": "vitest run --coverage.enabled",
-    "test:dev": "vitest --coverage.enabled",
-    "release": "pnpm publish"
+  "author": "SonOfMagic <qq1324318532@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/escape#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonofmagic/weapp-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sonofmagic/weapp-core/issues"
   },
   "keywords": [
     "weapp",
@@ -14,7 +19,6 @@
     "css"
   ],
   "sideEffects": false,
-  "type": "commonjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -28,19 +32,15 @@
   "files": [
     "dist"
   ],
+  "scripts": {
+    "build": "unbuild",
+    "test": "vitest run --coverage.enabled",
+    "test:dev": "vitest --coverage.enabled",
+    "release": "pnpm publish"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "author": "SonOfMagic <qq1324318532@gmail.com>",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sonofmagic/weapp-core.git"
-  },
-  "bugs": {
-    "url": "https://github.com/sonofmagic/weapp-core/issues"
-  },
-  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/escape#readme",
   "dependencies": {}
 }
