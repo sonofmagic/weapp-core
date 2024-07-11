@@ -3,6 +3,7 @@ import { defineBuildConfig } from 'unbuild'
 
 export default defineBuildConfig({
   // entries: ['./src/index', './src/cli'],
+  // entries: ['./src/index'],
   rollup: {
     // 内联，相当于 nodeResolve
     inlineDependencies: true,
@@ -12,13 +13,13 @@ export default defineBuildConfig({
     cjsBridge: true,
     dts: {
       // https://github.com/unjs/unbuild/issues/135
-      respectExternal: false
-    }
+      respectExternal: false,
+    },
   },
   alias: {
     // 别名
-    '@': path.resolve(__dirname, './src')
+    '@': path.resolve(__dirname, './src'),
   },
   // dts
-  declaration: true
+  declaration: true,
 })

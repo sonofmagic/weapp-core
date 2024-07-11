@@ -1,6 +1,6 @@
 export type ItemOrItemArray<T> = T | T[]
 
-export type ICustomRegexp = {
+export interface ICustomRegexp {
   tagRegexp: RegExp
   attrRegexp: RegExp
   tag: string

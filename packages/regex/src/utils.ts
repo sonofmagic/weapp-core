@@ -2,7 +2,7 @@ export function isRegexp(value: unknown) {
   return Object.prototype.toString.call(value) === '[object RegExp]'
 }
 
-export const matchAll = (regex: RegExp, str: string) => {
+export function matchAll(regex: RegExp, str: string) {
   const arr = []
   let res
   do {

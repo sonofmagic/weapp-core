@@ -1,12 +1,17 @@
 {
   "name": "@weapp-core/http",
+  "type": "commonjs",
   "version": "0.1.0",
   "description": "weapp http global object",
-  "scripts": {
-    "build": "unbuild",
-    "test": "vitest run --coverage",
-    "test:dev": "vitest --coverage",
-    "release": "pnpm publish"
+  "author": "SonOfMagic <qq1324318532@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/regex#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonofmagic/weapp-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sonofmagic/weapp-core/issues"
   },
   "keywords": [
     "weapp",
@@ -15,7 +20,6 @@
     "util"
   ],
   "sideEffects": false,
-  "type": "commonjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -29,20 +33,16 @@
   "files": [
     "dist"
   ],
+  "scripts": {
+    "build": "unbuild",
+    "test": "vitest run --coverage",
+    "test:dev": "vitest --coverage",
+    "release": "pnpm publish"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "author": "SonOfMagic <qq1324318532@gmail.com>",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sonofmagic/weapp-core.git"
-  },
-  "bugs": {
-    "url": "https://github.com/sonofmagic/weapp-core/issues"
-  },
-  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/regex#readme",
   "devDependencies": {
     "axios": "^1.6.7",
     "event-target-shim": "^6.0.2"

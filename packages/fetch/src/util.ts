@@ -1,4 +1,5 @@
 import type { PlainObject } from './type'
+
 export function isObject(o: any): boolean {
   return Object.prototype.toString.call(o) === '[object Object]'
 }
@@ -8,7 +9,7 @@ export function getType(payload: any): string {
 }
 
 export function isPlainObject(payload: any): payload is PlainObject {
-  if (getType(payload) !== 'Object') return false
+  if (getType(payload) !== 'Object') { return false }
   const prototype = Object.getPrototypeOf(payload)
   return !!prototype && prototype.constructor === Object && prototype === Object.prototype
 }
@@ -16,7 +17,8 @@ export function isPlainObject(payload: any): payload is PlainObject {
 export function fixUrl(url: string) {
   try {
     return url === '' && global.location.href ? global.location.href : url
-  } catch {
+  }
+  catch {
     return url
   }
 }

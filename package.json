@@ -16,7 +16,7 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "build": "turbo run build",
+    "build": "turbo run build --filter=@weapp-core/escape",
     "dev": "turbo run dev --parallel",
     "test": "vitest run --coverage.enabled",
     "test:dev": "vitest --coverage.enabled",

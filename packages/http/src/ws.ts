@@ -1,6 +1,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
-import { EventTarget, Event, getEventAttributeValue, setEventAttributeValue } from 'event-target-shim'
+import { Event, EventTarget, getEventAttributeValue, setEventAttributeValue } from 'event-target-shim'
 import { refs } from './defaults'
+
 type BinaryType = 'blob' | 'arraybuffer'
 
 const CONNECTING = 0 as const
@@ -26,7 +27,7 @@ export class WeappWebSocketEvent<TEventType extends string, TRes> extends Event<
 }
 
 // https://developers.weixin.qq.com/miniprogram/dev/api/network/websocket/SocketTask.html
-export type EventSourceEventMap = {
+export interface EventSourceEventMap {
   close: WeappWebSocketEvent<'close', WechatMiniprogram.SocketTaskOnCloseListenerResult>
   error: WeappWebSocketEvent<'error', WechatMiniprogram.GeneralCallbackResult>
   message: WeappWebSocketEvent<'message', WechatMiniprogram.SocketTaskOnMessageListenerResult>
@@ -67,14 +68,14 @@ export function createWeappWebSocket(connectSocketMethod: WechatMiniprogram.Wx['
       url: string | URL,
       protocols?: string | string[],
       options?: Partial<Omit<WechatMiniprogram.ConnectSocketOption, 'url' | 'protocols'>>,
-      connectSocket = connectSocketMethod
+      connectSocket = connectSocketMethod,
     ) {
       super()
       this.url = typeof url === 'string' ? url : url.toString()
 
       const params = {
         url: this.url,
-        protocols: typeof protocols === 'string' ? [protocols] : protocols
+        protocols: typeof protocols === 'string' ? [protocols] : protocols,
       }
       if (typeof options === 'object') {
         for (const k of Object.keys(options)) {
@@ -157,7 +158,7 @@ export function createWeappWebSocket(connectSocketMethod: WechatMiniprogram.Wx['
           },
           fail(err) {
             reject(err)
-          }
+          },
         })
       })
     }
@@ -172,7 +173,7 @@ export function createWeappWebSocket(connectSocketMethod: WechatMiniprogram.Wx['
           },
           fail(err) {
             reject(err)
-          }
+          },
         })
       })
     }

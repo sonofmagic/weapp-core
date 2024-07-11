@@ -1,4 +1,4 @@
-import type { ICustomRegexp, ItemOrItemArray, ICreateRegexpOptions } from './types'
+import type { ICreateRegexpOptions, ICustomRegexp, ItemOrItemArray } from './types'
 import { isRegexp } from './utils'
 
 // https://github.com/sindresorhus/escape-string-regexp
@@ -9,9 +9,9 @@ export function escapeStringRegexp(str: string) {
   return str.replaceAll(/[$()*+.?[\\\]^{|}]/g, '\\$&').replaceAll('-', '\\x2d')
 }
 
-export const templateClassExactRegexp = /(?<=^|\s)(?:hover-)?class=(?:["']\W+\s*\w+\()?["']([^"]+)["']/gs
+export const templateClassExactRegexp = /(?<=^|\s)(?:hover-)?class=(?:["']\W+\w+\()?["']([^"]+)["']/g
 
-export const tagWithEitherClassAndHoverClassRegexp = /<[a-z][a-z-]*[a-z]*\s+[^>]*?(?:hover-)?class="[^"]*"[^>]*?\/?>/g
+export const tagWithEitherClassAndHoverClassRegexp = /<[a-z][a-z-]*\s[^>]*?(?:hover-)?class="[^"]*"[^>]*?\/?>/g
 
 export function handleRegexp(reg: RegExp): string {
   return `(?:${reg.source})`
@@ -21,9 +21,11 @@ export function getSourceString(input: string | RegExp) {
   let result
   if (typeof input === 'string') {
     result = input
-  } else if (isRegexp(input)) {
+  }
+  else if (isRegexp(input)) {
     result = input.source
-  } else {
+  }
+  else {
     result = input.toString()
   }
   return result
@@ -36,15 +38,18 @@ export function makePattern(arr: ItemOrItemArray<string | RegExp>): string {
       .reduce<string[]>((acc, cur) => {
         if (typeof cur === 'string') {
           acc.push(cur)
-        } else if (isRegexp(cur)) {
+        }
+        else if (isRegexp(cur)) {
           acc.push(handleRegexp(cur))
         }
         return acc
       }, [])
       .join('|')
-  } else if (typeof arr === 'string') {
+  }
+  else if (typeof arr === 'string') {
     pattern = arr
-  } else if (isRegexp(arr)) {
+  }
+  else if (isRegexp(arr)) {
     pattern = handleRegexp(arr)
   }
 
@@ -79,12 +84,12 @@ export function makeCustomAttributes(entries?: [string | RegExp, ItemOrItemArray
         tagRegexp: createTemplateHandlerMatchRegexp(k, v),
         attrRegexp: createTemplateClassRegexp(v),
         tag: getSourceString(k),
-        attrs: v
+        attrs: v,
       }
     })
   }
 }
 
-export const variableRegExp = /{{(.*?)}}/gs
+export const variableRegExp = /\{\{(.*?)\}\}/gs
 // 只匹配有闭合标签的
-export const wxsTagRegexp = /<wxs\s*(?:[a-z][a-z-]*[a-z]*(?:\s*=\s*".*?")?)*\s*>(.*?)<\/wxs>/gs
+export const wxsTagRegexp = /<wxs\s*(?:(?:[a-z][a-z-]*(?:\s*=\s*".*?")?)+\s*)?>(.*?)<\/wxs>/gs

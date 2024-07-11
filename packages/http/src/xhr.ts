@@ -1,5 +1,6 @@
 import { Event, EventTarget, getEventAttributeValue, setEventAttributeValue } from 'event-target-shim'
 import { refs } from './defaults'
+
 const SUPPORT_METHOD = new Set(['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'])
 const STATUS_TEXT_MAP: Record<string, string> = {
   100: 'Continue',
@@ -45,10 +46,10 @@ const STATUS_TEXT_MAP: Record<string, string> = {
   502: 'Bad Gateway',
   503: 'Service Unavailable',
   504: 'Gateway Timeout',
-  505: 'HTTP Version Not Supported'
+  505: 'HTTP Version Not Supported',
 }
 // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#events
-export type EventSourceEventMap = {
+export interface EventSourceEventMap {
   abort: XMLHttpRequestEvent<'abort'>
   error: XMLHttpRequestEvent<'error'>
   load: XMLHttpRequestEvent<'load'>
@@ -186,7 +187,7 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
       this.#statusText = ''
       this.#readyState = XMLHttpRequest.UNSENT
       this.#header = {
-        Accept: '*/*'
+        Accept: '*/*',
       }
       this.#responseType = ''
       this.#resHeader = null
@@ -227,7 +228,7 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
         setTimeout(() => {
           if (!this.#status && this.#readyState !== XMLHttpRequest.DONE) {
             // 超时
-            if (this.#requestTask) this.#requestTask.abort()
+            if (this.#requestTask) { this.#requestTask.abort() }
             this.#callReadyStateChange(XMLHttpRequest.DONE)
             const timeoutEvent = createXMLHttpRequestEvent('timeout', 0)
             this.dispatchEvent(timeoutEvent)
@@ -266,7 +267,7 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
         responseType: this.#responseType === 'arraybuffer' ? 'arraybuffer' : 'text',
         success: this.#requestSuccess.bind(this),
         fail: this.#requestFail.bind(this),
-        complete: this.#requestComplete.bind(this)
+        complete: this.#requestComplete.bind(this),
       })
     }
 
@@ -307,7 +308,7 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
         this.#requestSuccess({
           data: err,
           statusCode: err.status,
-          header: err.headers
+          header: err.headers,
         })
         return
       }
@@ -338,7 +339,7 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
     }
 
     set timeout(timeout) {
-      if (typeof timeout !== 'number' || !Number.isFinite(timeout) || timeout <= 0) return
+      if (typeof timeout !== 'number' || !Number.isFinite(timeout) || timeout <= 0) { return }
 
       this.#timeout = timeout
     }
@@ -348,9 +349,9 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
     }
 
     get statusText() {
-      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED) return ''
+      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED) { return '' }
 
-      return STATUS_TEXT_MAP[this.#status + ''] || this.#statusText || ''
+      return STATUS_TEXT_MAP[`${this.#status}`] || this.#statusText || ''
     }
 
     get readyState() {
@@ -362,7 +363,7 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
     }
 
     set responseType(value) {
-      if (typeof value !== 'string') return
+      if (typeof value !== 'string') { return }
 
       this.#responseType = value
     }
@@ -396,18 +397,18 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
     }
 
     getAllResponseHeaders() {
-      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED || !this.#resHeader) return ''
+      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED || !this.#resHeader) { return '' }
 
       return Object.keys(this.#resHeader)
-        .map((key) => `${key}: ${this.#resHeader![key]}`)
+        .map(key => `${key}: ${this.#resHeader![key]}`)
         .join('\r\n')
     }
 
     getResponseHeader(name: any) {
-      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED || !this.#resHeader) return null
+      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED || !this.#resHeader) { return null }
 
       // 处理大小写不敏感
-      const key = Object.keys(this.#resHeader).find((item) => item.toLowerCase() === name.toLowerCase())
+      const key = Object.keys(this.#resHeader).find(item => item.toLowerCase() === name.toLowerCase())
       const value = key ? this.#resHeader[key] : null
 
       return typeof value === 'string' ? value : null
@@ -415,10 +416,10 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     open(method: any, url: any, async: boolean = true, user: string | null = null, password: string | null = null): void {
-      if (typeof method === 'string') method = method.toUpperCase()
+      if (typeof method === 'string') { method = method.toUpperCase() }
 
-      if (!SUPPORT_METHOD.has(method)) return
-      if (!url || typeof url !== 'string') return
+      if (!SUPPORT_METHOD.has(method)) { return }
+      if (!url || typeof url !== 'string') { return }
 
       this.#method = method
       this.#url = url
@@ -433,7 +434,7 @@ export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
     }
 
     send(data?: any) {
-      if (this.#readyState !== XMLHttpRequest.OPENED) return
+      if (this.#readyState !== XMLHttpRequest.OPENED) { return }
 
       this.#data = data
       this.#callRequest()
