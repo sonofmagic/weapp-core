@@ -21,7 +21,7 @@
     "test": "vitest run --coverage.enabled",
     "test:dev": "vitest --coverage.enabled",
     "lint": "turbo run lint",
-    "release": "turbo run release",
+    "release": "changeset",
     "publish-packages": "turbo run build lint --filter=@weapp-core/escape && npm run test && changeset version && changeset publish",
     "sync": "cnpm sync @weapp-core/escape @weapp-core/regex @weapp-core/http @weapp-core/runtime-injector weapp-websocket weapp-xmlhttprequest",
     "script:init": "monorepo init",
