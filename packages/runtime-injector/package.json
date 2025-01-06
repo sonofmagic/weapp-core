@@ -31,6 +31,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
-    "unplugin": "^1.7.1"
+    "unplugin": "^2.1.2"
   }
 }

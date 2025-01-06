@@ -44,7 +44,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "devDependencies": {
-    "axios": "^1.6.7",
+    "axios": "^1.7.9",
     "event-target-shim": "^6.0.2"
   }
 }

@@ -2,12 +2,15 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Node",
-    "esModuleInterop": true,
-    "strict": true,
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
     "types": [
-      "vitest/globals",
-      "miniprogram-api-typings"
-    ]
+      "vitest/globals"
+    ],
+    "allowJs": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   }
 }
