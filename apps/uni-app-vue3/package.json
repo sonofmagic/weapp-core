@@ -69,7 +69,7 @@
     "@dcloudio/uni-automator": "3.0.0-4040520250104002",
     "@dcloudio/uni-cli-shared": "3.0.0-4040520250104002",
     "@dcloudio/uni-stacktracey": "3.0.0-4040520250104002",
-    "@dcloudio/vite-plugin-uni": "3.0.0-4040520250104002",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-3000020210521001",
     "@rollup/plugin-inject": "^5.0.3",
     "@rollup/plugin-node-resolve": "^15.2.1",
     "@rollup/plugin-replace": "^6.0.2",
