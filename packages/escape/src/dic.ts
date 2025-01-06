@@ -136,8 +136,7 @@ export const SimpleMappingChars2String: MappingStringDictionary = {
   '}': '_',
   '+': 'a',
   ',': 'b',
-  // for tailwind-merge
-  ':': '_c_',
+  ':': 'c',
   '.': 'd',
   '=': 'e',
   ';': 'f',
