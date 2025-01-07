@@ -43,7 +43,7 @@
     "open:build": "weapp open -p dist/build/mp-weixin"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "3.0.0-4040520250104002",
+    "@dcloudio/uni-app": "3.0.0-alpha-4040420241231001",
     "@dcloudio/uni-app-harmony": "3.0.0-4040520250104002",
     "@dcloudio/uni-app-plus": "3.0.0-4040520250104002",
     "@dcloudio/uni-components": "3.0.0-4040520250104002",
