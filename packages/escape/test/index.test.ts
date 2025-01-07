@@ -1,4 +1,4 @@
-import { MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries, escape, isAsciiNumber } from '@/index'
+import { escape, isAsciiNumber, MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries } from '@/index'
 
 const testCase = `1234567890-=\b~!@#$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?`
 describe('index', () => {
@@ -84,5 +84,26 @@ describe('index', () => {
   it('-string 0 ignoreHead', () => {
     const res = escape('-aplmkoi', { ignoreHead: true })
     expect(res).toBe('-aplmkoi')
+  })
+
+  it('should return an empty string when input is empty', () => {
+    expect(escape('')).toBe('')
+  })
+
+  it('should escape characters based on the mapping', () => {
+    expect(escape('abc', { map: { a: 'A', b: 'B' } })).toBe('ABc')
+  })
+
+  it('should handle Unicode characters', () => {
+    expect(escape('😊')).toBe('ud83dude0a')
+  })
+
+  it('should handle the first character correctly', () => {
+    expect(escape('1abc', { ignoreHead: false })).toBe('_1abc')
+    expect(escape('1abc', { ignoreHead: true })).toBe('1abc')
+  })
+
+  it('should use default options when none are provided', () => {
+    expect(escape('abc')).toBe('abc')
   })
 })
