@@ -165,8 +165,8 @@ importers:
         specifier: 3.0.0-4040520250104002
         version: 3.0.0-4040520250104002(@dcloudio/types@3.4.14)(postcss@8.4.49)(rollup@3.28.1)(ts-node@10.9.2(@types/node@22.10.5)(typescript@5.7.2))(vue@3.5.13(typescript@5.7.2))
       '@dcloudio/uni-app-harmony':
-        specifier: 3.0.0-4040520250104002
-        version: 3.0.0-4040520250104002(postcss@8.4.49)(rollup@3.28.1)(ts-node@10.9.2(@types/node@22.10.5)(typescript@5.7.2))(vite@5.2.8(@types/node@22.10.5)(terser@5.31.2))(vue@3.5.13(typescript@5.7.2))
+        specifier: 3.0.0-alpha-4010320240415001
+        version: 3.0.0-alpha-4010320240415001
       '@dcloudio/uni-app-plus':
         specifier: 3.0.0-4040520250104002
         version: 3.0.0-4040520250104002(postcss@8.4.49)(rollup@3.28.1)(ts-node@10.9.2(@types/node@22.10.5)(typescript@5.7.2))(vite@5.2.8(@types/node@22.10.5)(terser@5.31.2))(vue@3.5.13(typescript@5.7.2))
@@ -1151,8 +1151,8 @@ packages:
   '@dcloudio/types@3.4.14':
     resolution: {integrity: sha512-VolQeZfTh8pQFsr2IlfIVX93blfvGTuBoJuZUc7iWOqtHV8gDrq6fXLhzsVlgZyuhhRZLOxlo33rkEqnY+ucAw==}
 
-  '@dcloudio/uni-app-harmony@3.0.0-4040520250104002':
-    resolution: {integrity: sha512-UP8g6AQVuMhiQmeX03/T88OhMPtJBXEnjyVnsWxbCi5M22Qjt7yfyoTedLcOn1ttN8bGD6l0BY6CuSSCWqLXTA==}
+  '@dcloudio/uni-app-harmony@3.0.0-alpha-4010320240415001':
+    resolution: {integrity: sha512-xu48+F/HSHqzVB2ScBSsrfUHRB5nADg2p1MNX7/gSDw5AMh97mVE4rF/MQ7PUUlGDWE9I/gJPl6tt9JXw1Tjew==}
 
   '@dcloudio/uni-app-plus@3.0.0-4040520250104002':
     resolution: {integrity: sha512-skRBNw1LZQdQdXGFoPaDlo4Baq27k4yAb2LHeVbbJS0Rx8aRSe7ePuy1NeBomCTAQuOJqA+ZAbyVD6yZSNINFw==}
@@ -9706,22 +9706,14 @@ snapshots:
 
   '@dcloudio/types@3.4.14': {}
 
-  '@dcloudio/uni-app-harmony@3.0.0-4040520250104002(postcss@8.4.49)(rollup@3.28.1)(ts-node@10.9.2(@types/node@22.10.5)(typescript@5.7.2))(vite@5.2.8(@types/node@22.10.5)(terser@5.31.2))(vue@3.5.13(typescript@5.7.2))':
+  '@dcloudio/uni-app-harmony@3.0.0-alpha-4010320240415001':
     dependencies:
-      '@dcloudio/uni-app-vite': 3.0.0-4040520250104002(postcss@8.4.49)(rollup@3.28.1)(ts-node@10.9.2(@types/node@22.10.5)(typescript@5.7.2))(vite@5.2.8(@types/node@22.10.5)(terser@5.31.2))(vue@3.5.13(typescript@5.7.2))
       debug: 4.4.0
       fs-extra: 10.1.0
       licia: 1.38.2
       postcss-selector-parser: 6.1.2
     transitivePeerDependencies:
-      - '@nuxt/kit'
-      - '@vueuse/core'
-      - postcss
-      - rollup
       - supports-color
-      - ts-node
-      - vite
-      - vue
 
   '@dcloudio/uni-app-plus@3.0.0-4040520250104002(postcss@8.4.49)(rollup@3.28.1)(ts-node@10.9.2(@types/node@22.10.5)(typescript@5.7.2))(vite@5.2.8(@types/node@22.10.5)(terser@5.31.2))(vue@3.5.13(typescript@5.7.2))':
     dependencies:
