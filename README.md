@@ -1,17 +1,34 @@
 # weapp-core
 
-[![codecov](https://codecov.io/gh/sonofmagic/weapp-core/branch/main/graph/badge.svg?token=2r8F9csV3h)](https://codecov.io/gh/sonofmagic/weapp-core)
+## Projects
 
-## Repos
+- [@weapp-core/escape](packages/escape) - escape class name in weapp
+- [@weapp-core/http](packages/http) - weapp http global object
+- [@weapp-core/regex](packages/regex) - weapp regex utils
+- [@weapp-core/runtime-injector](packages/runtime-injector) - runtime-injector
+- [weapp-websocket](packages/websocket) - weapp-websocket
+- [weapp-xmlhttprequest](packages/xmlhttprequest) - weapp-xmlhttprequest
 
-[@weapp-core/escape](./packages/escape)
+## Contributing
 
-[@weapp-core/regex](./packages/regex)
+Contributions Welcome! You can contribute in the following ways.
 
-[@weapp-core/http](./packages/http)
+- Create an Issue - Propose a new feature. Report a bug.
+- Pull Request - Fix a bug and typo. Refactor the code.
+- Create third-party middleware - Instruct below.
+- Share - Share your thoughts on the Blog, X, and others.
+- Make your application - Please try to use weapp-core.
 
-[@weapp-core/runtime-injector](./packages/runtime-injector)
+For more details, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-[weapp-websocket](./packages/websocket)
+## Contributors
 
-[weapp-xmlhttprequest](./packages/runtime-injector)
+Thanks to [all contributors](https://github.com/sonofmagic/weapp-core/graphs/contributors)!
+
+## Authors
+
+ice breaker <1324318532@qq.com>
+
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.

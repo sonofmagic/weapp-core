@@ -3,12 +3,13 @@
   "type": "commonjs",
   "version": "1.0.1",
   "description": "weapp regex utils",
-  "author": "SonOfMagic <qq1324318532@gmail.com>",
+  "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",
   "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/regex#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sonofmagic/weapp-core.git"
+    "url": "git+https://github.com/sonofmagic/weapp-core.git",
+    "directory": "packages/regex"
   },
   "bugs": {
     "url": "https://github.com/sonofmagic/weapp-core/issues"

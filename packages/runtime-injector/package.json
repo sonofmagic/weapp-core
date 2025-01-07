@@ -9,7 +9,7 @@
     "release": "pnpm publish"
   },
   "keywords": [],
-  "author": "",
+  "author": "ice breaker <1324318532@qq.com>",
   "license": "ISC",
   "sideEffects": false,
   "type": "commonjs",
@@ -32,5 +32,13 @@
   },
   "dependencies": {
     "unplugin": "^2.1.2"
+  },
+  "bugs": {
+    "url": "https://github.com/sonofmagic/weapp-core/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonofmagic/weapp-core.git",
+    "directory": "packages/runtime-injector"
   }
 }

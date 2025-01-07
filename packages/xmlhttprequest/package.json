@@ -19,7 +19,7 @@
     "apollo",
     "graphql-client"
   ],
-  "author": "SonOfMagic <qq1324318532@gmail.com>",
+  "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",
   "sideEffects": false,
   "type": "commonjs",
@@ -42,5 +42,13 @@
   },
   "dependencies": {
     "@weapp-core/http": "workspace:^"
+  },
+  "bugs": {
+    "url": "https://github.com/sonofmagic/weapp-core/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonofmagic/weapp-core.git",
+    "directory": "packages/xmlhttprequest"
   }
 }
