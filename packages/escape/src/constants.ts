@@ -161,3 +161,5 @@ export const SimpleMappingChars2String: MappingStringDictionary = {
 }
 
 export const SimpleMappingChars2StringEntries = Object.entries(SimpleMappingChars2String)
+
+export const MAX_ASCII_CHAR_CODE = 127

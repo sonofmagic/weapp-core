@@ -1,13 +1,12 @@
+import type { EscapeOptions } from './types'
 import { defu } from 'defu'
-import { SimpleMappingChars2String } from './dic'
-
-const MAX_ASCII_CHAR_CODE = 127
+import { MAX_ASCII_CHAR_CODE, SimpleMappingChars2String } from './constants'
 
 export function isAsciiNumber(code: number) {
   return code >= 48 && code <= 57
 }
 
-export function handleFirstCharacter(char: string, nextChar: string | undefined, ignoreHead: boolean): string {
+function handleFirstCharacter(char: string, nextChar: string | undefined, ignoreHead: boolean): string {
   if (!ignoreHead) {
     const code = char.codePointAt(0)!
     if (isAsciiNumber(code)) {
@@ -23,20 +22,15 @@ export function handleFirstCharacter(char: string, nextChar: string | undefined,
   return char
 }
 
-export interface Options {
-  map?: Record<string, string>
-  ignoreHead?: boolean
-}
-
 export function escape(
   selectors: string,
-  options?: Options,
+  options?: EscapeOptions,
 ) {
   if (selectors.length === 0) {
     return ''
   }
 
-  const { map, ignoreHead } = defu<Required<Options>, Options[]>(options, {
+  const { map, ignoreHead } = defu<Required<EscapeOptions>, EscapeOptions[]>(options, {
     map: SimpleMappingChars2String,
     ignoreHead: false,
   })

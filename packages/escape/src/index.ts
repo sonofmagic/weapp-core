@@ -1,2 +1,3 @@
+export * from './constants'
 export * from './escape'
-export * from './dic'
+export * from './types'
