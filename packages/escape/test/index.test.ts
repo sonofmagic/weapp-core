@@ -1,6 +1,14 @@
-import { escape, isAsciiNumber, MappingChars2String, MappingChars2StringEntries, SimpleMappingChars2String, SimpleMappingChars2StringEntries } from '@/index'
+import {
+  escape,
+  isAsciiNumber,
+  ComplexMappingChars2String as MappingChars2String,
+  ComplexMappingChars2StringEntries as MappingChars2StringEntries,
+  MappingChars2String as SimpleMappingChars2String,
+  MappingChars2StringEntries as SimpleMappingChars2StringEntries,
+} from '@/index'
 
 const testCase = `1234567890-=\b~!@#$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?`
+
 describe('index', () => {
   it('map count eq', () => {
     expect(MappingChars2StringEntries.length).toBe(SimpleMappingChars2StringEntries.length)

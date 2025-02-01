@@ -1,6 +1,6 @@
 import type { EscapeOptions } from './types'
 import { defu } from 'defu'
-import { MAX_ASCII_CHAR_CODE, SimpleMappingChars2String } from './constants'
+import { MappingChars2String, MAX_ASCII_CHAR_CODE } from './constants'
 
 export function isAsciiNumber(code: number) {
   return code >= 48 && code <= 57
@@ -31,7 +31,7 @@ export function escape(
   }
 
   const { map, ignoreHead } = defu<Required<EscapeOptions>, EscapeOptions[]>(options, {
-    map: SimpleMappingChars2String,
+    map: MappingChars2String,
     ignoreHead: false,
   })
 

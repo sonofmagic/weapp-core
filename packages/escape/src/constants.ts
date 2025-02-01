@@ -42,7 +42,7 @@ export type SYMBOL_TABLE_TYPE_VALUES = SYMBOL_TABLE_TYPE[keyof SYMBOL_TABLE_TYPE
 
 export type MappingStringDictionary = Record<Exclude<SYMBOL_TABLE_TYPE_VALUES, '-' | '_' | ' '>, string>
 
-export const MappingChars2String: MappingStringDictionary = {
+export const ComplexMappingChars2String: MappingStringDictionary = {
   '[': '_bl_',
   ']': '_br_',
   '(': '_pl_',
@@ -78,7 +78,7 @@ export const MappingChars2String: MappingStringDictionary = {
   // _: '_u_'
 } as const
 
-export const MappingChars2StringEntries = Object.entries(MappingChars2String)
+export const ComplexMappingChars2StringEntries = Object.entries(ComplexMappingChars2String)
 // 用 _ 比 - 好
 // https://www.rapidtables.com/code/text/ascii-table.html
 // ID选择器和类选择器对大小写敏感
@@ -127,13 +127,14 @@ export const MappingChars2StringEntries = Object.entries(MappingChars2String)
 // 126 7E ~ ✔
 // #endregion
 // 15 + 7 + 6 + 4 = 32
-export const SimpleMappingChars2String: MappingStringDictionary = {
+export const MappingChars2String: MappingStringDictionary = {
   '[': '_',
   ']': '_',
-  '(': '_',
-  ')': '_',
-  '{': '_',
-  '}': '_',
+  // for tailwindcss v4
+  '(': 'y',
+  ')': 'y',
+  '{': 'z',
+  '}': 'z',
   '+': 'a',
   ',': 'b',
   ':': 'c',
@@ -160,6 +161,6 @@ export const SimpleMappingChars2String: MappingStringDictionary = {
   '"': 'x',
 }
 
-export const SimpleMappingChars2StringEntries = Object.entries(SimpleMappingChars2String)
+export const MappingChars2StringEntries = Object.entries(MappingChars2String)
 
 export const MAX_ASCII_CHAR_CODE = 127
