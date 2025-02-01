@@ -1,5 +1,11 @@
 # @weapp-core/escape
 
+## 4.0.0
+
+### Major Changes
+
+- [`d291730`](https://github.com/sonofmagic/weapp-core/commit/d291730fe279b0945546e4376738996441e04240) Thanks [@sonofmagic](https://github.com/sonofmagic)! - rename `SimpleMappingChars2String` -> `MappingChars2String`
+
 ## 3.0.1
 
 ### Patch Changes
