@@ -93,8 +93,8 @@ importers:
         specifier: ^11.3.0
         version: 11.3.0
       get-value:
-        specifier: ^3.0.1
-        version: 3.0.1
+        specifier: ^4.0.0
+        version: 4.0.0
       husky:
         specifier: ^9.1.6
         version: 9.1.7
@@ -3159,9 +3159,8 @@ packages:
   get-tsconfig@4.7.5:
     resolution: {integrity: sha512-ZCuZCnlqNzjb4QprAzXKdpp/gh6KTxSJuw3IBsPnV/7fV4NxC9ckB+vPTt8w7fJA0TaSD7c55BR47JD6MEDyDw==}
 
-  get-value@3.0.1:
-    resolution: {integrity: sha512-mKZj9JLQrwMBtj5wxi6MH8Z5eSKaERpAwjg43dPtlGI1ZVEgH/qC7T8/6R2OBSUA+zzHBZgICsVJaEIV2tKTDA==}
-    engines: {node: '>=6.0'}
+  get-value@4.0.0:
+    resolution: {integrity: sha512-sjJCQJnc9r3cN4+3+SYyqI9wf67BzgDwr/P59b2rbHUcF/1I//GjJCMhXvYYGL6ACjHzCYBFVLAYIzT433s2Tg==}
 
   git-raw-commits@4.0.0:
     resolution: {integrity: sha512-ICsMM1Wk8xSGMowkOmPrzo2Fgmfo4bMHLNX6ytHjajRJUqvHOw/TFapQ+QG75c3X/tTDDhOSRPGC52dDbNM8FQ==}
@@ -9781,9 +9780,7 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  get-value@3.0.1:
-    dependencies:
-      isobject: 3.0.1
+  get-value@4.0.0: {}
 
   git-raw-commits@4.0.0:
     dependencies:

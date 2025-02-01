@@ -58,7 +58,7 @@
     "eslint": "^9.19.0",
     "execa": "^9.5.2",
     "fs-extra": "^11.3.0",
-    "get-value": "^3.0.1",
+    "get-value": "^4.0.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.4.3",
     "lodash": "^4.17.21",
