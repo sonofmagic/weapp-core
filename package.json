@@ -7,7 +7,7 @@
     "apps/*",
     "packages/*"
   ],
-  "packageManager": "pnpm@9.15.2",
+  "packageManager": "pnpm@9.15.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sonofmagic/weapp-core.git"
