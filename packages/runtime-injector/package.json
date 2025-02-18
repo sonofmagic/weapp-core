@@ -1,18 +1,20 @@
 {
   "name": "@weapp-core/runtime-injector",
+  "type": "commonjs",
   "version": "0.0.0",
   "description": "runtime-injector",
-  "scripts": {
-    "build": "unbuild",
-    "test": "vitest run",
-    "test:dev": "vitest",
-    "release": "pnpm publish"
-  },
-  "keywords": [],
   "author": "ice breaker <1324318532@qq.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonofmagic/weapp-core.git",
+    "directory": "packages/runtime-injector"
+  },
+  "bugs": {
+    "url": "https://github.com/sonofmagic/weapp-core/issues"
+  },
+  "keywords": [],
   "sideEffects": false,
-  "type": "commonjs",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -26,19 +28,17 @@
   "files": [
     "dist"
   ],
+  "scripts": {
+    "build": "unbuild",
+    "test": "vitest run",
+    "test:dev": "vitest",
+    "release": "pnpm publish"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
-    "unplugin": "^2.1.2"
-  },
-  "bugs": {
-    "url": "https://github.com/sonofmagic/weapp-core/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sonofmagic/weapp-core.git",
-    "directory": "packages/runtime-injector"
+    "unplugin": "^2.2.0"
   }
 }

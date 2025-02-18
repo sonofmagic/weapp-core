@@ -6,6 +6,10 @@ export function isAsciiNumber(code: number) {
   return code >= 48 && code <= 57
 }
 
+export function isAllowedClassName(className: string) {
+  return /^[\w-]+$/.test(className)
+}
+
 function handleFirstCharacter(char: string, nextChar: string | undefined, ignoreHead: boolean): string {
   if (!ignoreHead) {
     const code = char.codePointAt(0)!

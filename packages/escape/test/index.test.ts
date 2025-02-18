@@ -1,5 +1,6 @@
 import {
   escape,
+  isAllowedClassName,
   isAsciiNumber,
   ComplexMappingChars2String as MappingChars2String,
   ComplexMappingChars2StringEntries as MappingChars2StringEntries,
@@ -113,5 +114,28 @@ describe('index', () => {
 
   it('should use default options when none are provided', () => {
     expect(escape('abc')).toBe('abc')
+  })
+
+  describe('isAllowedClassName', () => {
+    it('case 0', () => {
+      expect(isAllowedClassName('abc')).toBe(true)
+      expect(isAllowedClassName('-abc')).toBe(true)
+      expect(isAllowedClassName('_abc')).toBe(true)
+      expect(isAllowedClassName('abc-')).toBe(true)
+      expect(isAllowedClassName('abc_')).toBe(true)
+      expect(isAllowedClassName('abc-_')).toBe(true)
+      expect(isAllowedClassName('abc-_1')).toBe(true)
+      expect(isAllowedClassName('abc-_1a')).toBe(true)
+      expect(isAllowedClassName('abc-_1a-')).toBe(true)
+      expect(isAllowedClassName('abc-_1a-1')).toBe(true)
+      expect(isAllowedClassName('abc-_1a-1a')).toBe(true)
+      expect(isAllowedClassName('abc-_1a-1a-')).toBe(true)
+    })
+
+    it('case 1', () => {
+      expect(isAllowedClassName('p-1')).toBe(true)
+      expect(isAllowedClassName('p-[2px]')).toBe(false)
+      expect(isAllowedClassName('p-(--xx)')).toBe(false)
+    })
   })
 })
