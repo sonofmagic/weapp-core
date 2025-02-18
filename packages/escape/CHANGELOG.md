@@ -1,5 +1,11 @@
 # @weapp-core/escape
 
+## 4.0.1
+
+### Patch Changes
+
+- [`3c0056e`](https://github.com/sonofmagic/weapp-core/commit/3c0056e0cd433f84abb32c6d8da10ec5594e1de6) Thanks [@sonofmagic](https://github.com/sonofmagic)! - feat: add isAllowedClassName function export
+
 ## 4.0.0
 
 ### Major Changes
