@@ -4,7 +4,7 @@ export default defineConfig(
   () => {
     return {
       test: {
-        workspace: [
+        projects: [
           'packages/*',
           'apps/*',
         ],
@@ -13,6 +13,9 @@ export default defineConfig(
           all: false,
           skipFull: true,
         },
+        forceRerunTriggers: [
+          '**/{vitest,vite}.config.*/**',
+        ],
       },
     }
   },
