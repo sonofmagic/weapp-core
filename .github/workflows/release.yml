@@ -27,7 +27,7 @@ jobs:
       - uses: pnpm/action-setup@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: pnpm
@@ -48,6 +48,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           npm_config_registry: https://registry.npmjs.org
+          # https://github.com/changesets/changesets/pull/1659
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
