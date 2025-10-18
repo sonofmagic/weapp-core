@@ -1,1 +1,9 @@
-export { XMLHttpRequest, XMLHttpRequestEvent } from '@weapp-core/http'
+export {
+  XMLHttpRequest,
+  XMLHttpRequestEvent,
+  XMLHttpRequestErrorEvent,
+  getWxAdapter,
+  setWxAdapter,
+  type XMLHttpRequestEventMap,
+  type WxAdapter,
+} from '@weapp-core/http'

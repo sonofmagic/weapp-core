@@ -1,7 +1,7 @@
 {
   "name": "weapp-websocket",
   "version": "2.0.0",
-  "description": "weapp-websocket",
+  "description": "Spec-compliant WebSocket implementation for WeChat mini programs",
   "scripts": {
     "build": "unbuild",
     "test": "vitest run",
@@ -11,13 +11,10 @@
   "keywords": [
     "weapp",
     "websocket",
-    "socket.io",
-    "graphql",
-    "graphql-ws",
-    "subscriptions-transport-ws",
-    "subscription",
-    "apollo",
-    "graphql-client"
+    "wechat",
+    "mini-program",
+    "fetch",
+    "polyfill"
   ],
   "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",

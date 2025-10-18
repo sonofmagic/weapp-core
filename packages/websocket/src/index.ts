@@ -1,1 +1,10 @@
-export { WebSocket, WebSocketEvent } from '@weapp-core/http'
+export {
+  WebSocket,
+  WebSocketMessageEvent,
+  WebSocketCloseEvent,
+  WebSocketErrorEvent,
+  getWxAdapter,
+  setWxAdapter,
+  type WeappWebSocketOptions,
+  type WxAdapter,
+} from '@weapp-core/http'

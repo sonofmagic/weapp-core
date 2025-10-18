@@ -1,26 +1,34 @@
 # weapp-fetch
 
-> 这是一个在小程序中实现 fetch 标准 api 的 npm 包
->
-## 为什么需要它？
+Mini 程序环境下的 `fetch` 轻量封装，直接复用 [`@weapp-core/http`](../http) 的实现，默认同时导出 `Headers`、`Request`、`Response` 等工具。
 
-我想在 `weapp` 环境下，使用现代的 `graphql` 客户端，主要是 `graphql-request` 和 `@apollo/client`
+## 安装
 
-然而，它们都依赖于 `fetch` 这个 api，同时因为含义上传文件部分，它们也都需要 `FormData` 这样的对象
-
-这显然在小程序这个环境下是没有的，所以，我就想着 `fork` 一下 `graphql-request` 做一个阉割版本的，在小程序环境里使用，就这样。
-
-## Usage
-
-```js
-const { createFetch } = require('weapp-fetch')
-// cjs or esm
-import { createFetch } from 'weapp-fetch'
-// maybe you need @ts-ignore
-const weappFetch = createFetch(wx.request)
-const uniFetch = createFetch(uni.request)
-const taroFetch = createFetch(taro.request)
-
-weappFetch(resource)
-weappFetch(resource, options)
+```bash
+pnpm add weapp-fetch
+# 或 npm / yarn
 ```
+
+## 使用
+
+```ts
+import { fetch, createFetch, setWxAdapter } from 'weapp-fetch'
+
+// 可选：显式指定适配器
+setWxAdapter({
+  request: wx.request,
+})
+
+const res = await fetch('https://example.com/api/todos')
+const data = await res.json()
+
+// 如果你需要基于其他 request 实现（如 Taro、uni-app）
+const taroFetch = createFetch(Taro.request)
+```
+
+## 导出内容
+
+- `fetch`：与浏览器一致的 `fetch` API
+- `Headers`、`Request`、`Response`：与 Web 平台保持一致的数据结构
+- `setWxAdapter` / `getWxAdapter`：管理小程序请求/连接适配器
+- `createFetch(request)`：返回绑定自定义 request 方法的 `fetch`

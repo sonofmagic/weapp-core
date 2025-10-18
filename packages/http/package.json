@@ -2,10 +2,10 @@
   "name": "@weapp-core/http",
   "type": "commonjs",
   "version": "0.1.0",
-  "description": "weapp http global object",
+  "description": "Browser-style fetch, WebSocket, and XMLHttpRequest for WeChat mini programs",
   "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",
-  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/regex#readme",
+  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/http#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sonofmagic/weapp-core.git",
@@ -16,9 +16,11 @@
   },
   "keywords": [
     "weapp",
-    "http",
-    "global",
-    "util"
+    "wechat",
+    "mini-program",
+    "fetch",
+    "websocket",
+    "xmlhttprequest"
   ],
   "sideEffects": false,
   "exports": {
@@ -44,8 +46,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "devDependencies": {
-    "axios": "^1.12.2",
+  "dependencies": {
     "event-target-shim": "^6.0.2"
   }
 }

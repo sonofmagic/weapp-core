@@ -1,5 +1,3 @@
-/// <reference types="miniprogram-api-typings" />
-
 declare module 'event-target-shim' {
   class Event<TType extends string = string> {
     constructor(type: TType, eventInitDict?: Event.EventInit)

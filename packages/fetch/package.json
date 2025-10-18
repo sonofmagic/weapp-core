@@ -2,7 +2,7 @@
   "name": "weapp-fetch",
   "version": "1.0.0",
   "private": true,
-  "description": "fetch in weapp",
+  "description": "Thin fetch wrapper built on top of @weapp-core/http for mini programs",
   "scripts": {
     "build": "unbuild",
     "test": "vitest run",
@@ -11,11 +11,21 @@
   },
   "keywords": [
     "weapp",
-    "weapp-fetch",
+    "wechat",
+    "mini-program",
     "fetch"
   ],
   "author": "SonOfMagic <qq1324318532@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/sonofmagic/weapp-core/tree/main/packages/fetch#readme",
+  "bugs": {
+    "url": "https://github.com/sonofmagic/weapp-core/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sonofmagic/weapp-core.git",
+    "directory": "packages/fetch"
+  },
   "sideEffects": false,
   "type": "commonjs",
   "exports": {

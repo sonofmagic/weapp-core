@@ -2,9 +2,9 @@
   "name": "@weapp-core/runtime-injector",
   "type": "commonjs",
   "version": "0.0.0",
-  "description": "runtime-injector",
+  "description": "Inject fetch/WebSocket/XMLHttpRequest polyfills into mini-program runtimes",
   "author": "ice breaker <1324318532@qq.com>",
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sonofmagic/weapp-core.git",
@@ -13,7 +13,13 @@
   "bugs": {
     "url": "https://github.com/sonofmagic/weapp-core/issues"
   },
-  "keywords": [],
+  "keywords": [
+    "weapp",
+    "wechat",
+    "mini-program",
+    "runtime",
+    "polyfill"
+  ],
   "sideEffects": false,
   "exports": {
     ".": {
@@ -39,6 +45,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
-    "unplugin": "^2.3.10"
+    "@weapp-core/http": "workspace:^"
   }
 }

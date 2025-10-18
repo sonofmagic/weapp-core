@@ -1,135 +1,34 @@
 # weapp-xmlhttprequest
 
-use new Websocket(url,protocols) in weapp
+基于 [`@weapp-core/http`](../http) 的 `XMLHttpRequest` 封装，提供与浏览器一致的 API，在微信小程序及其他基于 `wx.request` 的运行时中可直接替换使用。
 
-- [weapp-xmlhttprequest](#weapp-xmlhttprequest)
-  - [Quick Start](#quick-start)
-  - [Options](#options)
-  - [Graphql usage](#graphql-usage)
-    - [subscriptions-transport-ws](#subscriptions-transport-ws)
-    - [graphql-ws](#graphql-ws)
+## 安装
 
-## Quick Start
-
-```sh
-npm i weapp-websocket
-# or
-yarn add weapp-websocket
-# or
-pnpm add weapp-websocket
+```bash
+pnpm add weapp-xmlhttprequest
 ```
 
-```js
-import { WeappWebSocket } from 'weapp-websocket'
-const ws = new WeappWebSocket('ws://127.0.0.1:3000/graphql',['graphql-ws'])
+## 使用
 
-ws.close()
-ws.close(code)
-ws.close(code, reason)
-ws.send(data)
-ws.addEventListener('close', (event) => { })
-ws.onclose = (event) => { }
-addEventListener('error', (event) => { })
+```ts
+import {
+  XMLHttpRequest,
+  setWxAdapter,
+} from 'weapp-xmlhttprequest'
 
-onerror = (event) => { }
-addEventListener('message', (event) => { })
+setWxAdapter({ request: wx.request })
 
-onmessage = (event) => { }
+const xhr = new XMLHttpRequest()
+xhr.open('POST', 'https://example.com/api/todo')
+xhr.setRequestHeader('Content-Type', 'application/json')
+xhr.onload = () => console.log(xhr.status, xhr.responseText)
+xhr.onerror = () => console.error('network error')
+xhr.send(JSON.stringify({ title: 'mini app' }))
 ```
 
-## Options
+## 特性
 
-```js
-constructor(
-    url: string | URL,
-    protocols?: string | string[],
-    options?: Partial<
-      Omit<WechatMiniprogram.ConnectSocketOption, 'url' | 'protocols'>
-    >,
-    connectSocket = wx.connectSocket
-)
-// so you can use 
-uni.connectSocket
-Taro.connectSocket 
-// etc... to create custom websockets
-```
-
-API refers link: <https://developer.mozilla.org/en-US/docs/Web/API/WebSocket>
-
-Options refers link: <https://developers.weixin.qq.com/miniprogram/dev/api/network/websocket/wx.connectSocket.html>
-
-## Graphql usage
-
-This package is useful for creating clients in weapp environment.
-
-### subscriptions-transport-ws
-
-protocol: `graphql-ws`
-
-you maybe create a client in this way:
-
-```js
-import { SubscriptionClient } from 'subscriptions-transport-ws'
-import { WeappWebSocket } from 'weapp-websocket'
-
-const wsClient = new SubscriptionClient('ws://127.0.0.1:3000/graphql', {
-  connectionParams: {
-    // your params
-  }
-  // other options
-}, // pass WeappWebSocket to webSocketImpl 
-WeappWebSocket)
-
-wsClient.request({
-  query: `
-subscription {
-   something{
-     id
-     value
-   }
- }
-`
-}).subscribe({
-  next (res) {
-    console.log(res)
-  },
-  error (err) {
-    console.log(err)
-  }
-})
-```
-
-### graphql-ws
-
-protocol: `graphql-transport-ws`
-
-```js
-import { createClient } from 'graphql-ws'
-import { WeappWebSocket } from 'weapp-websocket'
-
-const wsClient = createClient({
-  url: 'ws://localhost:3000/graphql',
-  webSocketImpl: WeappWebSocket
-})
-
-wsClient.subscribe({
-        query: `
-             subscription {
-         something{
-           id
-           value
-         }
-       }
-        `
-      }, {
-        next (res) {
-          console.log(res)
-        },
-        error (err) {
-          console.log(err)
-        },
-        complete () {
-
-        }
-      })
-```
+- 支持 `responseType`（`text` / `json` / `arraybuffer`）以及超时、中断处理
+- 自动处理大小写不敏感的请求/响应头
+- 与浏览器事件模型一致（`load`, `error`, `timeout`, `readystatechange` 等）
+- 可通过 `setWxAdapter` 替换底层 `request` 实现（Taro、uni-app 等）

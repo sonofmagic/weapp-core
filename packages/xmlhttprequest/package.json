@@ -1,7 +1,7 @@
 {
   "name": "weapp-xmlhttprequest",
   "version": "2.0.0",
-  "description": "weapp-xmlhttprequest",
+  "description": "XMLHttpRequest polyfill for WeChat mini programs",
   "scripts": {
     "build": "unbuild",
     "test": "vitest run",
@@ -11,13 +11,10 @@
   "keywords": [
     "weapp",
     "xmlhttprequest",
-    "socket.io",
-    "graphql",
-    "graphql-ws",
-    "subscriptions-transport-ws",
-    "subscription",
-    "apollo",
-    "graphql-client"
+    "wechat",
+    "mini-program",
+    "xhr",
+    "polyfill"
   ],
   "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",

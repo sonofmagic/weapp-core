@@ -2,12 +2,19 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": [
+      "ESNext",
       "DOM"
     ],
     "baseUrl": ".",
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "@weapp-core/http": [
+        "../http/src/index.ts"
+      ],
+      "@weapp-core/http/*": [
+        "../http/src/*"
       ]
     }
   },
