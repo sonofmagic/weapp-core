@@ -9,6 +9,8 @@ const CLOSED = 3 as const
 type WEBSOCKET_EVENTS = 'close' | 'error' | 'message' | 'open'
 // const nextWebSocketId = 0
 
+type Listener = (...args: any[]) => void
+
 export type SimpleWeappWebSocketTask = WechatMiniprogram.SocketTask & {
   readyState: number
   CLOSED: number
@@ -26,12 +28,12 @@ export class SimpleWeappWebSocket implements Omit<WebSocket, 'onclose' | 'onerro
     close: [],
     error: [],
     message: [],
-    open: []
+    open: [],
   } as {
-    close: Function[]
-    error: Function[]
-    message: Function[]
-    open: Function[]
+    close: Listener[]
+    error: Listener[]
+    message: Listener[]
+    open: Listener[]
   }
 
   CONNECTING = CONNECTING
@@ -46,13 +48,13 @@ export class SimpleWeappWebSocket implements Omit<WebSocket, 'onclose' | 'onerro
     url: string | URL,
     protocols?: string | string[],
     options?: Partial<Omit<WechatMiniprogram.ConnectSocketOption, 'url' | 'protocols'>>,
-    connectSocket = wx.connectSocket
+    connectSocket = wx.connectSocket,
   ) {
     this.url = typeof url === 'string' ? url : url.toString()
 
     const params: WechatMiniprogram.ConnectSocketOption = {
       url: this.url,
-      protocols: typeof protocols === 'string' ? [protocols] : protocols
+      protocols: typeof protocols === 'string' ? [protocols] : protocols,
     }
     if (typeof options === 'object') {
       for (const k of Object.keys(options)) {
@@ -94,69 +96,73 @@ export class SimpleWeappWebSocket implements Omit<WebSocket, 'onclose' | 'onerro
   private onerrorIndex: number = -1
   private onmessageIndex: number = -1
   private onopenIndex: number = -1
-  get onclose(): Function | null {
+  get onclose(): Listener | null {
     return this.eventMap.close[this.oncloseIndex] || null
   }
 
-  set onclose(fn: Function | null) {
+  set onclose(fn: Listener | null) {
     if (fn) {
       if (typeof fn === 'function') {
         this.eventMap.close.push(fn)
         this.oncloseIndex = this.eventMap.close.length - 1
       }
       // do nothing
-    } else {
+    }
+    else {
       this.eventMap.close.splice(this.oncloseIndex, 1)
       this.oncloseIndex = -1
     }
   }
 
-  get onerror(): Function | null {
+  get onerror(): Listener | null {
     return this.eventMap.error[this.onerrorIndex] || null
   }
 
-  set onerror(fn: Function | null) {
+  set onerror(fn: Listener | null) {
     if (fn) {
       if (typeof fn === 'function') {
         this.eventMap.error.push(fn)
         this.onerrorIndex = this.eventMap.error.length - 1
       }
       // do nothing
-    } else {
+    }
+    else {
       this.eventMap.error.splice(this.onerrorIndex, 1)
       this.onerrorIndex = -1
     }
   }
 
-  get onmessage(): Function | null {
+  get onmessage(): Listener | null {
     return this.eventMap.message[this.onmessageIndex] || null
   }
 
-  set onmessage(fn: Function | null) {
+  set onmessage(fn: Listener | null) {
     if (fn) {
       if (typeof fn === 'function') {
         this.eventMap.message.push(fn)
         this.onmessageIndex = this.eventMap.message.length - 1
       }
       // do nothing
-    } else {
+    }
+    else {
       this.eventMap.message.splice(this.onmessageIndex, 1)
       this.onmessageIndex = -1
     }
   }
 
-  get onopen(): Function | null {
+  get onopen(): Listener | null {
     return this.eventMap.open[this.onopenIndex] || null
   }
 
-  set onopen(fn: Function | null) {
+  set onopen(fn: Listener | null) {
     if (fn) {
       if (typeof fn === 'function') {
         this.eventMap.open.push(fn)
         this.onopenIndex = this.eventMap.open.length - 1
       }
       // do nothing
-    } else {
+    }
+    else {
       this.eventMap.open.splice(this.onopenIndex, 1)
       this.onopenIndex = -1
     }
@@ -180,7 +186,7 @@ export class SimpleWeappWebSocket implements Omit<WebSocket, 'onclose' | 'onerro
         },
         fail(err) {
           reject(err)
-        }
+        },
       })
     })
   }
@@ -194,14 +200,14 @@ export class SimpleWeappWebSocket implements Omit<WebSocket, 'onclose' | 'onerro
         },
         fail(err) {
           reject(err)
-        }
+        },
       })
     })
   }
 
   addEventListener(
     type: WEBSOCKET_EVENTS,
-    listener: Function
+    listener: Listener,
     // options?: unknown
   ): void {
     if (this.eventMap[type]) {
@@ -211,7 +217,7 @@ export class SimpleWeappWebSocket implements Omit<WebSocket, 'onclose' | 'onerro
 
   removeEventListener(
     type: WEBSOCKET_EVENTS,
-    listener: Function
+    listener: Listener,
     // options?: unknown
   ): void {
     if (this.eventMap[type]) {

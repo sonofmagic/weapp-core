@@ -1,445 +1,492 @@
 import { Event, EventTarget, getEventAttributeValue, setEventAttributeValue } from 'event-target-shim'
-import { refs } from './defaults'
+import { getWxAdapter } from './defaults'
+import { getHeaderValue, normaliseResponseHeaders, resolveStatusText } from './shared'
 
-const SUPPORT_METHOD = new Set(['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'])
-const STATUS_TEXT_MAP: Record<string, string> = {
-  100: 'Continue',
-  101: 'Switching protocols',
+type ReadyState = 0 | 1 | 2 | 3 | 4
 
-  200: 'OK',
-  201: 'Created',
-  202: 'Accepted',
-  203: 'Non-Authoritative Information',
-  204: 'No Content',
-  205: 'Reset Content',
-  206: 'Partial Content',
+const UNSENT = 0 as const
+const OPENED = 1 as const
+const HEADERS_RECEIVED = 2 as const
+const LOADING = 3 as const
+const DONE = 4 as const
 
-  300: 'Multiple Choices',
-  301: 'Moved Permanently',
-  302: 'Found',
-  303: 'See Other',
-  304: 'Not Modified',
-  305: 'Use Proxy',
-  307: 'Temporary Redirect',
+const SAFE_METHODS = new Set(['GET', 'HEAD'])
+const SUPPORTED_METHODS = new Set(['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'CONNECT'])
 
-  400: 'Bad Request',
-  401: 'Unauthorized',
-  402: 'Payment Required',
-  403: 'Forbidden',
-  404: 'Not Found',
-  405: 'Method Not Allowed',
-  406: 'Not Acceptable',
-  407: 'Proxy Authentication Required',
-  408: 'Request Timeout',
-  409: 'Conflict',
-  410: 'Gone',
-  411: 'Length Required',
-  412: 'Precondition Failed',
-  413: 'Request Entity Too Large',
-  414: 'Request-URI Too Long',
-  415: 'Unsupported Media Type',
-  416: 'Requested Range Not Suitable',
-  417: 'Expectation Failed',
-
-  500: 'Internal Server Error',
-  501: 'Not Implemented',
-  502: 'Bad Gateway',
-  503: 'Service Unavailable',
-  504: 'Gateway Timeout',
-  505: 'HTTP Version Not Supported',
-}
-// https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#events
-export interface EventSourceEventMap {
-  abort: XMLHttpRequestEvent<'abort'>
-  error: XMLHttpRequestEvent<'error'>
-  load: XMLHttpRequestEvent<'load'>
-  loadend: XMLHttpRequestEvent<'loadend'>
-  loadstart: XMLHttpRequestEvent<'loadstart'>
-  progress: XMLHttpRequestEvent<'progress'>
-  readystatechange: XMLHttpRequestEvent<'readystatechange'>
-  timeout: XMLHttpRequestEvent<'timeout'>
+function normalizeHeaderName(name: string): string {
+  const value = `${name}`
+  if (!/^[!#$%&'*+\-.^`|~\w]+$/.test(value)) {
+    throw new TypeError(`Invalid character in header field name: "${name}"`)
+  }
+  return value
 }
 
-export class XMLHttpRequestEvent<TEventType extends keyof EventSourceEventMap> extends Event<TEventType> {
-  loaded: number
-  total: number
-  constructor(type: TEventType, eventInitDict?: Event.EventInit | undefined) {
-    super(type, eventInitDict)
-    this.loaded = 0
-    this.total = 0
+function normalizeHeaderValue(value: unknown): string {
+  return value === undefined ? '' : `${value}`
+}
+
+function toArrayBuffer(view: ArrayBufferView): ArrayBuffer {
+  return view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength) as ArrayBuffer
+}
+
+function createDomException(message: string, name: string): Error {
+  try {
+    return new DOMException(message, name)
+  }
+  catch {
+    const error = new Error(message)
+    error.name = name
+    return error
   }
 }
 
-export function createXMLHttpRequestEvent(event: keyof EventSourceEventMap, loaded: number) {
-  const e = new XMLHttpRequestEvent(event)
-  e.loaded = loaded
-  return e
+function prepareRequestBody(body: any, headers: Record<string, string>): any {
+  if (body == null) {
+    return undefined
+  }
+  if (typeof body === 'string') {
+    return body
+  }
+  if (body instanceof ArrayBuffer) {
+    return body
+  }
+  if (ArrayBuffer.isView(body)) {
+    return toArrayBuffer(body)
+  }
+  if (typeof URLSearchParams !== 'undefined' && body instanceof URLSearchParams) {
+    if (!headers['content-type']) {
+      headers['content-type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+    }
+    return body.toString()
+  }
+  if (typeof FormData !== 'undefined' && body instanceof FormData) {
+    return body
+  }
+  if (typeof body === 'object') {
+    if (!headers['content-type']) {
+      headers['content-type'] = 'application/json;charset=UTF-8'
+    }
+    return JSON.stringify(body)
+  }
+  return `${body}`
 }
 
-export function createXMLHttpRequest(defaultRequestMethod = refs.wx.request) {
-  return class XMLHttpRequest extends EventTarget<EventSourceEventMap, 'strict'> {
-    // implements IXMLHttpRequest {
-    static readonly UNSENT = 0
-    static readonly OPENED = 1
-    static readonly HEADERS_RECEIVED = 2
-    static readonly LOADING = 3
-    static readonly DONE = 4
-    readonly UNSENT = 0
-    readonly OPENED = 1
-    readonly HEADERS_RECEIVED = 2
-    readonly LOADING = 3
-    readonly DONE = 4
+export class XMLHttpRequestProgressEvent<TType extends string> extends Event<TType> {
+  readonly loaded: number
+  readonly total: number
+  readonly lengthComputable: boolean
 
-    static toString() {
-      return 'function XMLHttpRequest() { [native code] }'
+  constructor(type: TType, loaded = 0, total = 0) {
+    super(type)
+    this.loaded = loaded
+    this.total = total
+    this.lengthComputable = Number.isFinite(total)
+  }
+}
+
+export class XMLHttpRequestErrorEvent extends Event<'error'> {
+  readonly message: string
+  constructor(message: string) {
+    super('error')
+    this.message = message
+  }
+}
+
+export interface XMLHttpRequestEventMap {
+  abort: XMLHttpRequestProgressEvent<'abort'>
+  error: XMLHttpRequestErrorEvent
+  load: XMLHttpRequestProgressEvent<'load'>
+  loadend: XMLHttpRequestProgressEvent<'loadend'>
+  loadstart: XMLHttpRequestProgressEvent<'loadstart'>
+  progress: XMLHttpRequestProgressEvent<'progress'>
+  readystatechange: Event<'readystatechange'>
+  timeout: XMLHttpRequestProgressEvent<'timeout'>
+}
+
+function isAllowedResponseType(value: string): boolean {
+  return value === '' || value === 'text' || value === 'json' || value === 'arraybuffer'
+}
+
+export class MiniProgramXMLHttpRequest extends EventTarget<XMLHttpRequestEventMap, 'strict'> {
+  static readonly UNSENT: ReadyState = UNSENT
+  static readonly OPENED: ReadyState = OPENED
+  static readonly HEADERS_RECEIVED: ReadyState = HEADERS_RECEIVED
+  static readonly LOADING: ReadyState = LOADING
+  static readonly DONE: ReadyState = DONE
+
+  readonly UNSENT = UNSENT
+  readonly OPENED = OPENED
+  readonly HEADERS_RECEIVED = HEADERS_RECEIVED
+  readonly LOADING = LOADING
+  readonly DONE = DONE
+
+  timeout = 0
+  withCredentials = true
+
+  private method = 'GET'
+  private requestUrl = ''
+  private requestHeaders: Record<string, string> = {}
+  private responseHeaders: Record<string, string> | null = null
+  private requestTask: WechatMiniprogram.RequestTask | null = null
+  private readyStateInternal: ReadyState = UNSENT
+  private statusInternal = 0
+  private statusTextInternal = ''
+  private responseTypeInternal = ''
+  private responseData: any = null
+  private sendInvoked = false
+  private aborted = false
+  private timeoutId: ReturnType<typeof setTimeout> | null = null
+
+  get readyState(): ReadyState {
+    return this.readyStateInternal
+  }
+
+  get status(): number {
+    return this.statusInternal
+  }
+
+  get statusText(): string {
+    if (this.readyStateInternal === UNSENT || this.readyStateInternal === OPENED) {
+      return ''
+    }
+    return this.statusTextInternal
+  }
+
+  get responseType(): string {
+    return this.responseTypeInternal
+  }
+
+  set responseType(value: string) {
+    if (!isAllowedResponseType(value)) {
+      throw createDomException('Unsupported responseType', 'InvalidAccessError')
+    }
+    if (this.readyStateInternal !== OPENED || this.sendInvoked) {
+      throw createDomException('Failed to set responseType', 'InvalidStateError')
+    }
+    this.responseTypeInternal = value
+  }
+
+  get response(): any {
+    switch (this.responseTypeInternal) {
+      case 'arraybuffer':
+        return this.responseData instanceof ArrayBuffer
+          ? this.responseData
+          : this.responseData == null
+            ? null
+            : toArrayBuffer(new Uint8Array(new TextEncoder().encode(String(this.responseData))))
+      case 'json':
+        return this.responseData
+      case '':
+      case 'text':
+      default:
+        return this.responseText
+    }
+  }
+
+  get responseText(): string {
+    if (this.responseTypeInternal && this.responseTypeInternal !== 'text') {
+      return ''
+    }
+    if (typeof this.responseData === 'string') {
+      return this.responseData
+    }
+    if (this.responseData == null) {
+      return ''
+    }
+    return typeof this.responseData === 'object' ? JSON.stringify(this.responseData) : String(this.responseData)
+  }
+
+  get onreadystatechange() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'readystatechange') as ((event: Event<'readystatechange'>) => void) | null
+  }
+
+  set onreadystatechange(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'readystatechange', listener as any)
+  }
+
+  get onabort() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'abort') as ((event: XMLHttpRequestProgressEvent<'abort'>) => void) | null
+  }
+
+  set onabort(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'abort', listener as any)
+  }
+
+  get onerror() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'error') as ((event: XMLHttpRequestErrorEvent) => void) | null
+  }
+
+  set onerror(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'error', listener as any)
+  }
+
+  get onload() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'load') as ((event: XMLHttpRequestProgressEvent<'load'>) => void) | null
+  }
+
+  set onload(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'load', listener as any)
+  }
+
+  get onloadend() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'loadend') as ((event: XMLHttpRequestProgressEvent<'loadend'>) => void) | null
+  }
+
+  set onloadend(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'loadend', listener as any)
+  }
+
+  get onloadstart() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'loadstart') as ((event: XMLHttpRequestProgressEvent<'loadstart'>) => void) | null
+  }
+
+  set onloadstart(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'loadstart', listener as any)
+  }
+
+  get onprogress() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'progress') as ((event: XMLHttpRequestProgressEvent<'progress'>) => void) | null
+  }
+
+  set onprogress(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'progress', listener as any)
+  }
+
+  get ontimeout() {
+    return getEventAttributeValue(this as unknown as EventTarget, 'timeout') as ((event: XMLHttpRequestProgressEvent<'timeout'>) => void) | null
+  }
+
+  set ontimeout(listener) {
+    setEventAttributeValue(this as unknown as EventTarget, 'timeout', listener as any)
+  }
+
+  open(method: string, url: string, async = true): void {
+    if (!async) {
+      throw new Error('Synchronous XMLHttpRequest is not supported in mini-program environment.')
     }
 
-    toString() {
-      return '[object XMLHttpRequest]'
+    const upperMethod = method?.toUpperCase?.() ?? 'GET'
+    if (!SUPPORTED_METHODS.has(upperMethod)) {
+      throw new TypeError(`Unsupported HTTP method: ${method}`)
     }
 
-    #method: string
-    #url: string
-    #data: null
-    #status: number
-    #statusText: string
-    #readyState: number
-    #header: Record<string, any>
-    #responseType: string
-    #resHeader: null | Record<string, any>
-    #response: null
-    #timeout: number
-    #withCredentials: boolean
-    #requestTask: null | WechatMiniprogram.RequestTask
-    #requestMethod: WechatMiniprogram.Wx['request']
+    this.method = upperMethod
+    this.requestUrl = url
+    this.requestHeaders = {}
+    this.responseHeaders = null
+    this.responseData = null
+    this.statusInternal = 0
+    this.statusTextInternal = ''
+    this.responseTypeInternal = ''
+    this.sendInvoked = false
+    this.aborted = false
 
-    get onabort() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['abort']>(this, 'abort')
+    this.updateReadyState(OPENED)
+  }
+
+  setRequestHeader(name: string, value: string): void {
+    if (this.readyStateInternal !== OPENED || this.sendInvoked) {
+      throw createDomException('Cannot set request header at this time.', 'InvalidStateError')
+    }
+    const normalizedName = normalizeHeaderName(name)
+    const key = normalizedName.toLowerCase()
+    const nextValue = normalizeHeaderValue(value)
+    this.requestHeaders[key] = this.requestHeaders[key] ? `${this.requestHeaders[key]}, ${nextValue}` : nextValue
+  }
+
+  send(body?: any): void {
+    if (this.readyStateInternal !== OPENED) {
+      throw createDomException('Failed to execute send on XMLHttpRequest.', 'InvalidStateError')
+    }
+    if (this.sendInvoked) {
+      throw createDomException('Send has already been called.', 'InvalidStateError')
     }
 
-    set onabort(value) {
-      setEventAttributeValue(this, 'abort', value)
+    this.sendInvoked = true
+    const headers = { ...this.requestHeaders }
+    const payload = SAFE_METHODS.has(this.method) ? undefined : prepareRequestBody(body, headers)
+    const { request: requestAdapter } = getWxAdapter()
+
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('loadstart', 0, 0) as XMLHttpRequestEventMap['loadstart'])
+
+    const options: WechatMiniprogram.RequestOption = {
+      url: this.requestUrl,
+      method: this.method as WechatMiniprogram.RequestOption['method'],
+      header: headers,
+      data: payload,
+      responseType: this.responseTypeInternal === 'arraybuffer' ? 'arraybuffer' : 'text',
+      success: res => this.handleSuccess(res),
+      fail: err => this.handleFailure(err),
+      complete: () => this.clearTimeout(),
     }
 
-    get onerror() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['error']>(this, 'error')
+    if (this.responseTypeInternal === 'json') {
+      options.dataType = 'json'
     }
 
-    set onerror(value) {
-      setEventAttributeValue(this, 'error', value)
+    if (this.timeout > 0) {
+      options.timeout = this.timeout
+      this.timeoutId = setTimeout(() => this.handleTimeout(), this.timeout)
     }
 
-    get onload() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['load']>(this, 'load')
-    }
+    (options as any).enableCookie = this.withCredentials
 
-    set onload(value) {
-      setEventAttributeValue(this, 'load', value)
-    }
+    this.requestTask = requestAdapter(options)
+  }
 
-    get onloadend() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['loadend']>(this, 'loadend')
-    }
-
-    set onloadend(value) {
-      setEventAttributeValue(this, 'loadend', value)
-    }
-
-    get onloadstart() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['loadstart']>(this, 'loadstart')
-    }
-
-    set onloadstart(value) {
-      setEventAttributeValue(this, 'loadstart', value)
-    }
-
-    get onprogress() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['progress']>(this, 'progress')
-    }
-
-    set onprogress(value) {
-      setEventAttributeValue(this, 'progress', value)
-    }
-
-    get onreadystatechange() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['readystatechange']>(this, 'readystatechange')
-    }
-
-    set onreadystatechange(value) {
-      setEventAttributeValue(this, 'readystatechange', value)
-    }
-
-    get ontimeout() {
-      return getEventAttributeValue<XMLHttpRequest, EventSourceEventMap['timeout']>(this, 'timeout')
-    }
-
-    set ontimeout(value) {
-      setEventAttributeValue(this, 'timeout', value)
-    }
-
-    constructor(requestMethod = defaultRequestMethod) {
-      super()
-
-      this.#method = ''
-      this.#url = ''
-      this.#data = null
-      this.#status = 0
-      this.#statusText = ''
-      this.#readyState = XMLHttpRequest.UNSENT
-      this.#header = {
-        Accept: '*/*',
+  abort(): void {
+    this.aborted = true
+    this.clearTimeout()
+    if (this.requestTask) {
+      try {
+        this.requestTask.abort()
       }
-      this.#responseType = ''
-      this.#resHeader = null
-      this.#response = null
-      this.#timeout = 0
-      /** 向前兼容，默认为 true */
-      this.#withCredentials = true
-
-      this.#requestTask = null
-      this.#requestMethod = requestMethod
+      catch { }
     }
 
-    /**
-     * readyState 变化
-     */
-    #callReadyStateChange(readyState: any) {
-      const hasChange = readyState !== this.#readyState
-      this.#readyState = readyState
-
-      if (hasChange) {
-        const readystatechangeEvent = createXMLHttpRequestEvent('readystatechange', 0)
-        this.dispatchEvent(readystatechangeEvent)
-      }
+    if (this.readyStateInternal === UNSENT || (this.readyStateInternal === DONE && this.statusInternal === 0)) {
+      this.dispatchEvent(new XMLHttpRequestProgressEvent('abort', 0, 0) as XMLHttpRequestEventMap['abort'])
+      this.dispatchEvent(new XMLHttpRequestProgressEvent('loadend', 0, 0) as XMLHttpRequestEventMap['loadend'])
+      return
     }
 
-    /**
-     * 执行请求
-     */
-    #callRequest() {
-      // if (!window || !window.document) {
-      //   console.warn(
-      //     'this page has been unloaded, so this request will be canceled.'
-      //   )
-      //   return
-      // }
+    this.statusInternal = 0
+    this.statusTextInternal = ''
+    this.responseHeaders = null
+    this.responseData = null
+    this.updateReadyState(DONE)
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('abort', 0, 0) as XMLHttpRequestEventMap['abort'])
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('loadend', 0, 0) as XMLHttpRequestEventMap['loadend'])
+  }
 
-      if (this.#timeout) {
-        setTimeout(() => {
-          if (!this.#status && this.#readyState !== XMLHttpRequest.DONE) {
-            // 超时
-            if (this.#requestTask) { this.#requestTask.abort() }
-            this.#callReadyStateChange(XMLHttpRequest.DONE)
-            const timeoutEvent = createXMLHttpRequestEvent('timeout', 0)
-            this.dispatchEvent(timeoutEvent)
-          }
-        }, this.#timeout)
-      }
-
-      // 重置各种状态
-      this.#status = 0
-      this.#statusText = ''
-      this.#readyState = XMLHttpRequest.OPENED
-      this.#resHeader = null
-      this.#response = null
-
-      // 补完 url
-      const url = this.#url
-      // url = url.includes('//') ? url : window.location.origin + url
-
-      // 头信息
-      const header = Object.assign({}, this.#header)
-      // https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Cookies
-      // header.cookie = window.document.$$cookie
-      // if (!this.withCredentials) {
-      //   // 不同源，要求 withCredentials 为 true 才携带 cookie
-      //   const { origin } = parseUrl(url)
-      //   if (origin !== window.location.origin) delete header.cookie
-      // }
-      this.#requestTask = this.#requestMethod({
-        url,
-        data: this.#data || {},
-        header,
-        // @ts-ignore
-        method: this.#method,
-        // @ts-ignore
-        dataType: this.#responseType === 'json' ? 'json' : 'text',
-        responseType: this.#responseType === 'arraybuffer' ? 'arraybuffer' : 'text',
-        success: this.#requestSuccess.bind(this),
-        fail: this.#requestFail.bind(this),
-        complete: this.#requestComplete.bind(this),
-      })
+  getAllResponseHeaders(): string {
+    if (this.readyStateInternal < HEADERS_RECEIVED || !this.responseHeaders) {
+      return ''
     }
+    return Object.entries(this.responseHeaders)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('\r\n')
+  }
 
-    /**
-     * 请求成功
-     */
-    #requestSuccess({ data, statusCode, header }: any) {
-      // if (!window || !window.document) {
-      //   console.warn(
-      //     'this page has been unloaded, so this request will be canceled.'
-      //   )
-      //   return
-      // }
-
-      this.#status = statusCode
-      this.#resHeader = header
-
-      this.#callReadyStateChange(XMLHttpRequest.HEADERS_RECEIVED)
-
-      // 处理返回数据
-      if (data) {
-        this.#callReadyStateChange(XMLHttpRequest.LOADING)
-        const loadstartEvent = createXMLHttpRequestEvent('loadstart', header['Content-Length'])
-        this.dispatchEvent(loadstartEvent)
-
-        this.#response = data
-
-        const loadEvent = createXMLHttpRequestEvent('load', header['Content-Length'])
-        this.dispatchEvent(loadEvent)
-      }
-    }
-
-    /**
-     * 请求失败
-     */
-    #requestFail(err: any) {
-      if (err.status) {
-        this.#requestSuccess({
-          data: err,
-          statusCode: err.status,
-          header: err.headers,
-        })
-        return
-      }
-      this.#status = 0
-      this.#statusText = err.errMsg || err.errorMessage
-      const errorEvent = createXMLHttpRequestEvent('error', 0)
-      this.dispatchEvent(errorEvent)
-    }
-
-    /**
-     * 请求完成
-     */
-    #requestComplete() {
-      this.#requestTask = null
-      this.#callReadyStateChange(XMLHttpRequest.DONE)
-
-      if (this.#status) {
-        const loadendEvent = createXMLHttpRequestEvent('loadend', this.#header['Content-Length'])
-        this.dispatchEvent(loadendEvent)
-      }
-    }
-
-    /**
-     * 对外属性和方法
-     */
-    get timeout() {
-      return this.#timeout
-    }
-
-    set timeout(timeout) {
-      if (typeof timeout !== 'number' || !Number.isFinite(timeout) || timeout <= 0) { return }
-
-      this.#timeout = timeout
-    }
-
-    get status() {
-      return this.#status
-    }
-
-    get statusText() {
-      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED) { return '' }
-
-      return STATUS_TEXT_MAP[`${this.#status}`] || this.#statusText || ''
-    }
-
-    get readyState() {
-      return this.#readyState
-    }
-
-    get responseType() {
-      return this.#responseType
-    }
-
-    set responseType(value) {
-      if (typeof value !== 'string') { return }
-
-      this.#responseType = value
-    }
-
-    get responseText() {
-      if (!this.#responseType || this.#responseType === 'text') {
-        return this.#response
-      }
-
+  getResponseHeader(name: string): string | null {
+    if (this.readyStateInternal < HEADERS_RECEIVED) {
       return null
     }
+    const value = getHeaderValue(this.responseHeaders, name)
+    return value ?? null
+  }
 
-    get response() {
-      return this.#response
+  private updateReadyState(state: ReadyState): void {
+    if (state === this.readyStateInternal) {
+      return
     }
+    this.readyStateInternal = state
+    this.dispatchEvent(new Event('readystatechange') as XMLHttpRequestEventMap['readystatechange'])
+  }
 
-    get withCredentials() {
-      return this.#withCredentials
+  private handleSuccess(res: WechatMiniprogram.RequestSuccessCallbackResult<string | WechatMiniprogram.IAnyObject | ArrayBuffer>) {
+    if (this.aborted) {
+      return
     }
+    this.clearTimeout()
 
-    set withCredentials(value) {
-      this.#withCredentials = !!value
+    this.statusInternal = res.statusCode
+    this.statusTextInternal = resolveStatusText(res.statusCode, res.errMsg)
+    this.responseHeaders = normaliseResponseHeaders(res.header as Record<string, any> | undefined)
+
+    this.updateReadyState(HEADERS_RECEIVED)
+
+    this.responseData = this.parseResponseData(res.data)
+
+    this.updateReadyState(LOADING)
+    const total = Number(getHeaderValue(this.responseHeaders, 'content-length')) || 0
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('progress', total, total) as XMLHttpRequestEventMap['progress'])
+
+    this.updateReadyState(DONE)
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('load', total, total) as XMLHttpRequestEventMap['load'])
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('loadend', total, total) as XMLHttpRequestEventMap['loadend'])
+    this.requestTask = null
+  }
+
+  private handleFailure(err: WechatMiniprogram.GeneralCallbackResult) {
+    if (this.aborted) {
+      return
     }
+    this.clearTimeout()
+    this.statusInternal = 0
+    this.statusTextInternal = err?.errMsg ?? 'Network Error'
+    this.updateReadyState(DONE)
+    this.dispatchEvent(new XMLHttpRequestErrorEvent(this.statusTextInternal) as XMLHttpRequestEventMap['error'])
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('loadend', 0, 0) as XMLHttpRequestEventMap['loadend'])
+    this.requestTask = null
+  }
 
-    abort() {
-      if (this.#requestTask) {
-        this.#requestTask.abort()
-        const abortEvent = createXMLHttpRequestEvent('abort', 0)
-        this.dispatchEvent(abortEvent)
+  private handleTimeout() {
+    if (this.readyStateInternal === DONE) {
+      return
+    }
+    this.aborted = true
+    if (this.requestTask) {
+      try {
+        this.requestTask.abort()
       }
+      catch { }
     }
+    this.statusInternal = 0
+    this.statusTextInternal = 'timeout'
+    this.updateReadyState(DONE)
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('timeout', 0, 0) as XMLHttpRequestEventMap['timeout'])
+    this.dispatchEvent(new XMLHttpRequestProgressEvent('loadend', 0, 0) as XMLHttpRequestEventMap['loadend'])
+    this.requestTask = null
+  }
 
-    getAllResponseHeaders() {
-      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED || !this.#resHeader) { return '' }
-
-      return Object.keys(this.#resHeader)
-        .map(key => `${key}: ${this.#resHeader![key]}`)
-        .join('\r\n')
-    }
-
-    getResponseHeader(name: any) {
-      if (this.#readyState === XMLHttpRequest.UNSENT || this.#readyState === XMLHttpRequest.OPENED || !this.#resHeader) { return null }
-
-      // 处理大小写不敏感
-      const key = Object.keys(this.#resHeader).find(item => item.toLowerCase() === name.toLowerCase())
-      const value = key ? this.#resHeader[key] : null
-
-      return typeof value === 'string' ? value : null
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    open(method: any, url: any, async: boolean = true, user: string | null = null, password: string | null = null): void {
-      if (typeof method === 'string') { method = method.toUpperCase() }
-
-      if (!SUPPORT_METHOD.has(method)) { return }
-      if (!url || typeof url !== 'string') { return }
-
-      this.#method = method
-      this.#url = url
-
-      this.#callReadyStateChange(XMLHttpRequest.OPENED)
-    }
-
-    setRequestHeader(header: any, value: any) {
-      if (typeof header === 'string' && typeof value === 'string') {
-        this.#header[header] = value
-      }
-    }
-
-    send(data?: any) {
-      if (this.#readyState !== XMLHttpRequest.OPENED) { return }
-
-      this.#data = data
-      this.#callRequest()
+  private clearTimeout() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId)
+      this.timeoutId = null
     }
   }
+
+  private parseResponseData(data: any): any {
+    switch (this.responseTypeInternal) {
+      case 'arraybuffer':
+        if (data instanceof ArrayBuffer) {
+          return data
+        }
+        if (ArrayBuffer.isView(data)) {
+          return toArrayBuffer(data)
+        }
+        return new TextEncoder().encode(typeof data === 'string' ? data : JSON.stringify(data ?? '')).buffer
+      case 'json':
+        if (typeof data === 'string') {
+          try {
+            return data ? JSON.parse(data) : null
+          }
+          catch {
+            return null
+          }
+        }
+        return data
+      case '':
+      case 'text':
+      default:
+        if (typeof data === 'string') {
+          return data
+        }
+        if (data == null) {
+          return ''
+        }
+        return typeof data === 'object' ? JSON.stringify(data) : String(data)
+    }
+  }
+
+  static toString() {
+    return 'function XMLHttpRequest() { [native code] }'
+  }
+
+  toString() {
+    return '[object XMLHttpRequest]'
+  }
 }
-// https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest
-export const XMLHttpRequest = createXMLHttpRequest()
+
+export const XMLHttpRequest = MiniProgramXMLHttpRequest

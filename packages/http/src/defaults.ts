@@ -1,18 +1,50 @@
-function noop() {}
+type RequestAdapter = WechatMiniprogram.Wx['request']
+type ConnectSocketAdapter = WechatMiniprogram.Wx['connectSocket']
 
-let wxRef: WechatMiniprogram.Wx = {
-  // @ts-ignore
-  connectSocket: noop,
-  // @ts-ignore
-  request: noop,
+export interface WxAdapter {
+  request: RequestAdapter
+  connectSocket: ConnectSocketAdapter
 }
-try {
-  if (wx) {
-    wxRef = wx
+
+function missingRequest(): never {
+  throw new Error('`wx.request` is not available. Provide a WeChat adapter via `setWxAdapter`.')
+}
+
+function missingConnectSocket(): never {
+  throw new Error('`wx.connectSocket` is not available. Provide a WeChat adapter via `setWxAdapter`.')
+}
+
+const defaultAdapter: WxAdapter = {
+  request: (() => missingRequest()) as unknown as RequestAdapter,
+  connectSocket: (() => missingConnectSocket()) as unknown as ConnectSocketAdapter,
+}
+
+function resolveGlobalWx(): Partial<WxAdapter> | undefined {
+  const globalObject = (typeof globalThis === 'object' ? globalThis : undefined) as
+    | Record<string, any>
+    | undefined
+
+  if (globalObject && typeof globalObject.wx === 'object' && globalObject.wx) {
+    const wxGlobal = globalObject.wx as WechatMiniprogram.Wx
+    return {
+      request: wxGlobal.request.bind(wxGlobal),
+      connectSocket: wxGlobal.connectSocket.bind(wxGlobal),
+    }
   }
 }
-catch {}
 
-export const refs = {
-  wx: wxRef,
+let currentAdapter: WxAdapter = {
+  ...defaultAdapter,
+  ...resolveGlobalWx(),
+}
+
+export function getWxAdapter(): WxAdapter {
+  return currentAdapter
+}
+
+export function setWxAdapter(adapter: Partial<WxAdapter>): void {
+  currentAdapter = {
+    ...currentAdapter,
+    ...adapter,
+  }
 }

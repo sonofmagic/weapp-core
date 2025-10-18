@@ -140,7 +140,7 @@ Headers.prototype.forEach = function (callback, thisArg) {
 
 Headers.prototype.keys = function () {
   const items = []
-  for (const [name, value] of this.entries()) {
+  for (const [name] of this.entries()) {
     items.push(name)
   }
   return iteratorFor(items)
@@ -148,16 +148,18 @@ Headers.prototype.keys = function () {
 
 Headers.prototype.values = function () {
   const items = []
-  for (const value of this) {
+  for (const [, value] of this.entries()) {
     items.push(value)
   }
   return iteratorFor(items)
 }
 
 Headers.prototype.entries = function () {
-  const items = []
-  for (const [name, value] of this.entries()) {
-    items.push([name, value])
+  const items: [string, string][] = []
+  for (const name in this.map) {
+    if (this.map.hasOwnProperty(name)) {
+      items.push([name, this.map[name]])
+    }
   }
   return iteratorFor(items)
 }
