@@ -1,6 +1,6 @@
 {
   "name": "weapp-fetch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Thin fetch wrapper built on top of @weapp-core/http for mini programs",
   "scripts": {
