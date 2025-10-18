@@ -1,7 +1,7 @@
 {
   "name": "@weapp-core/http",
   "type": "commonjs",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Browser-style fetch, WebSocket, and XMLHttpRequest for WeChat mini programs",
   "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",

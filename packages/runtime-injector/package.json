@@ -1,7 +1,7 @@
 {
   "name": "@weapp-core/runtime-injector",
   "type": "commonjs",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Inject fetch/WebSocket/XMLHttpRequest polyfills into mini-program runtimes",
   "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",
