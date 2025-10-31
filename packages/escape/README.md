@@ -11,7 +11,8 @@
 ## Usage
 
 ```ts
-import { escape } from '@weapp-core/escape'
+import { escape, unescape } from '@weapp-core/escape'
 
-escape(str)
+const escaped = escape(str)
+const original = unescape(escaped)
 ```
