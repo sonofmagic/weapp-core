@@ -2,8 +2,8 @@ import path from 'node:path'
 import { defineBuildConfig } from 'unbuild'
 
 export default defineBuildConfig({
-  // entries: ['./src/index', './src/cli'],
-  // entries: ['./src/index'],
+  // 可按需指定入口，例如 ['./src/index', './src/cli']
+  // 默认仅构建入口示例 ['./src/index']
   rollup: {
     // 内联，相当于 nodeResolve
     inlineDependencies: true,
@@ -12,7 +12,7 @@ export default defineBuildConfig({
     // 添加 cjs 注入
     cjsBridge: true,
     dts: {
-      // https://github.com/unjs/unbuild/issues/135
+      // 相关问题记录：https://github.com/unjs/unbuild/issues/135
       respectExternal: false,
     },
   },

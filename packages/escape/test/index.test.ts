@@ -22,9 +22,7 @@ describe('index', () => {
       const num = char.codePointAt(0)
       if (num) {
         const res = isAsciiNumber(num)
-        // if (!res) {
-        //   console.log(char)
-        // }
+        // 如果出现 false，可在此输出字符调试
         expect(res).toBe(true)
       }
     }
@@ -139,6 +137,18 @@ describe('index', () => {
     const escaped = escape('-1', { map })
     expect(escaped).toBe('dash1')
     expect(unescape(escaped, { map })).toBe('-1')
+  })
+
+  it('should reuse cached merged map for repeated escape calls', () => {
+    const map = { '[': 'cachedL' }
+    expect(escape('[', { map })).toBe('cachedL')
+    expect(escape('[', { map })).toBe('cachedL')
+  })
+
+  it('should treat empty custom map as default mapping', () => {
+    const emptyMap: Record<string, string> = {}
+    const source = '![#'
+    expect(escape(source, { map: emptyMap })).toBe(escape(source))
   })
 
   it('should use default options when none are provided', () => {
@@ -256,7 +266,7 @@ describe('index', () => {
     })
 
     it('should decode the maximum unicode code point sequence', () => {
-      const maxCodePointChar = String.fromCodePoint(0x10ffff)
+      const maxCodePointChar = String.fromCodePoint(0x10FFFF)
       expect(unescape('u10ffff')).toBe(maxCodePointChar)
     })
 

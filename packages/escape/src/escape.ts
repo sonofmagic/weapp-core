@@ -1,5 +1,9 @@
 import type { EscapeOptions, UnescapeOptions } from './types'
-import { MappingChars2String, MAX_ASCII_CHAR_CODE } from './constants'
+import {
+  ComplexMappingChars2String,
+  MappingChars2String,
+  MAX_ASCII_CHAR_CODE,
+} from './constants'
 
 const DIGIT_MIN_CODE = 48
 const DIGIT_MAX_CODE = 57
@@ -8,6 +12,16 @@ const ESCAPE_PREFIX = '_'
 const UNICODE_PREFIX = 'u'
 const HEX_RADIX = 16
 const DEFAULT_ESCAPE_MAPPING: Record<string, string> = MappingChars2String
+const COMPLEX_ESCAPE_MAPPING: Record<string, string> = ComplexMappingChars2String
+const DEFAULT_ESCAPE_KEYS = new Set(Object.keys(DEFAULT_ESCAPE_MAPPING))
+const escapeMappingCache = new WeakMap<Record<string, string>, Record<string, string>>()
+
+interface InverseMappingResult {
+  inverse: Record<string, string>
+  tokens: string[]
+}
+
+const inverseMappingCache = new WeakMap<Record<string, string>, InverseMappingResult>()
 
 export function isAsciiNumber(code: number) {
   return code >= DIGIT_MIN_CODE && code <= DIGIT_MAX_CODE
@@ -18,22 +32,39 @@ export function isAllowedClassName(className: string) {
 }
 
 function createEscapeMapping(customMap?: Record<string, string>): Record<string, string> {
-  return customMap
-    ? { ...DEFAULT_ESCAPE_MAPPING, ...customMap }
-    : DEFAULT_ESCAPE_MAPPING
+  if (!customMap) {
+    return DEFAULT_ESCAPE_MAPPING
+  }
+
+  if (customMap === DEFAULT_ESCAPE_MAPPING || customMap === COMPLEX_ESCAPE_MAPPING) {
+    return customMap
+  }
+
+  const cached = escapeMappingCache.get(customMap)
+  if (cached) {
+    return cached
+  }
+
+  if (Object.keys(customMap).length === 0) {
+    escapeMappingCache.set(customMap, DEFAULT_ESCAPE_MAPPING)
+    return DEFAULT_ESCAPE_MAPPING
+  }
+
+  const merged = { ...DEFAULT_ESCAPE_MAPPING, ...customMap }
+  escapeMappingCache.set(customMap, merged)
+
+  return merged
 }
 
 function createUnescapeMapping(customMap?: Record<string, string>) {
   return customMap
-    ? { ...customMap }
-    : undefined
 }
 
 function hasOwnKey(object: Record<string, string>, key: string) {
   return Object.prototype.hasOwnProperty.call(object, key)
 }
 
-function createInverseMapping(mapping: Record<string, string>) {
+function buildInverseMapping(mapping: Record<string, string>): InverseMappingResult {
   const inverse: Record<string, string> = {}
   const tokens = new Set<string>()
 
@@ -47,13 +78,30 @@ function createInverseMapping(mapping: Record<string, string>) {
   return { inverse, tokens: sortedTokens }
 }
 
+function createInverseMapping(mapping: Record<string, string>) {
+  const cached = inverseMappingCache.get(mapping)
+
+  if (cached) {
+    return cached
+  }
+
+  const built = buildInverseMapping(mapping)
+  inverseMappingCache.set(mapping, built)
+
+  return built
+}
+
+function primeInverseCache(mapping: Record<string, string>) {
+  inverseMappingCache.set(mapping, buildInverseMapping(mapping))
+}
+
 function isHexDigit(char: string) {
   const code = char.codePointAt(0)!
 
   return (
-    (code >= 48 && code <= 57) // 0-9
-    || (code >= 65 && code <= 70) // A-F
-    || (code >= 97 && code <= 102) // a-f
+    (code >= 48 && code <= 57) // 0-9 数字
+    || (code >= 65 && code <= 70) // A-F 大写十六进制
+    || (code >= 97 && code <= 102) // a-f 小写十六进制
   )
 }
 
@@ -121,6 +169,7 @@ export function escape(
 
   const map = createEscapeMapping(options?.map)
   const ignoreHead = options?.ignoreHead ?? false
+  const usingDefaultMap = map === DEFAULT_ESCAPE_MAPPING
 
   const sb: string[] = []
   const characters = Array.from(selectors)
@@ -134,7 +183,13 @@ export function escape(
       continue
     }
 
-    if (hasOwnKey(map, char)) {
+    if (usingDefaultMap) {
+      if (DEFAULT_ESCAPE_KEYS.has(char)) {
+        sb.push(DEFAULT_ESCAPE_MAPPING[char])
+        continue
+      }
+    }
+    else if (hasOwnKey(map, char)) {
       sb.push(map[char])
       continue
     }
@@ -236,3 +291,6 @@ export function unescape(
 
   return shouldStrip ? result.slice(1) : result
 }
+
+primeInverseCache(DEFAULT_ESCAPE_MAPPING)
+primeInverseCache(COMPLEX_ESCAPE_MAPPING)

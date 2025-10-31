@@ -46,7 +46,7 @@
     "@types/node": "^24.9.2",
     "@types/semver": "^7.7.1",
     "@types/set-value": "^4.0.3",
-    "@vitest/coverage-v8": "~4.0.5",
+    "@vitest/coverage-v8": "~4.0.6",
     "@weapp-core/escape": "workspace:^",
     "@weapp-core/regex": "workspace:^",
     "ci-info": "^4.3.1",
@@ -71,6 +71,7 @@
     "set-value": "^4.1.0",
     "stylelint": "^16.25.0",
     "ts-node": "^10.9.2",
+    "tsdown": "^0.15.11",
     "tslib": "^2.8.1",
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
@@ -78,9 +79,8 @@
     "type-fest": "^5.1.0",
     "typescript": "^5.9.3",
     "unbuild": "^3.6.1",
-    "vitest": "~4.0.5",
-    "yaml": "^2.8.1",
-    "tsdown": "^0.15.11"
+    "vitest": "~4.0.6",
+    "yaml": "^2.8.1"
   },
   "publishConfig": {
     "access": "public",
