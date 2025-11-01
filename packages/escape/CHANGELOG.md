@@ -1,5 +1,11 @@
 # @weapp-core/escape
 
+## 5.0.1
+
+### Patch Changes
+
+- [`5898439`](https://github.com/sonofmagic/weapp-core/commit/58984396955c280378d084d39cd77f53cbd49846) Thanks [@sonofmagic](https://github.com/sonofmagic)! - 缩短默认转义标记并补充更多边界值用例，提升可读性与覆盖面。
+
 ## 5.0.0
 
 ### Major Changes
