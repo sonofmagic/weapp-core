@@ -1,5 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`index > escape 1`] = `"_1234567890-s1pss3iss0xss1sss0zss10ss11ss2mss12ss16ss14ss15s_s17sqwertyuiops2jss2lss2ksQWERTYUIOPs3fss3hss3gsasdfghjkls1nss13sASDFGHJKLs1mss0yszxcvbnms18ss1ass1bsZXCVBNMs1oss1qss1rs"`;
-
-exports[`index > escape with map 1`] = `"_1234567890-c1pcc3icc0xcc1scc0zcc10cc11cc2mcc12cc16cc14cc15c_c17cqwertyuiopc2jcc2lcc2kcQWERTYUIOPc3fcc3hcc3gcasdfghjklc1ncc13cASDFGHJKLc1mcc0yczxcvbnmc18cc1acc1bcZXCVBNMc1occ1qcc1rc"`;
