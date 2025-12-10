@@ -40,9 +40,31 @@ describe('escape', () => {
     expect(escape('abc', { map: { a: 'A', b: 'B' } })).toBe('ABc')
   })
 
+  it('should escape unicode when using custom map', () => {
+    const map = { a: 'A' }
+    expect(escape('我们a', { map })).toBe('u6211u4eecA')
+  })
+
+  it('should handle surrogate pairs when custom map is used', () => {
+    const map = { a: 'A' }
+    expect(escape('a😊', { map })).toBe('Au1f60a')
+  })
+
   it('should return unicode escape sequences for non-ascii characters', () => {
     expect(escape('我爱你')).toBe('u6211u7231u4f60')
     expect(escape('😊')).toBe('u1f60a')
+  })
+
+  it('should handle surrogate pairs when peeking the second character', () => {
+    expect(escape('a😊b')).toBe('au1f60ab')
+  })
+
+  it('should handle unmatched surrogate halves', () => {
+    expect(escape('\uD83D')).toBe('ud83d')
+  })
+
+  it('should ignore surrogate pairing when the trailing unit is not low surrogate', () => {
+    expect(escape('\uD83Da')).toBe('ud83da')
   })
 
   it('should escape contiguous mapped symbols', () => {

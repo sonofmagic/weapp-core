@@ -9,6 +9,40 @@ import {
 } from './mapping'
 import { isAsciiNumber } from './predicates'
 
+const HIGH_SURROGATE_MIN = 0xD800
+const HIGH_SURROGATE_MAX = 0xDBFF
+const LOW_SURROGATE_MIN = 0xDC00
+const LOW_SURROGATE_MAX = 0xDFFF
+const SURROGATE_OFFSET = 0x10000
+
+interface CodePointView {
+  code: number
+  size: number
+  char: string
+}
+
+function readCodePoint(value: string, index: number, length: number): CodePointView {
+  const firstUnit = value.charCodeAt(index)
+
+  if (firstUnit >= HIGH_SURROGATE_MIN && firstUnit <= HIGH_SURROGATE_MAX && index + 1 < length) {
+    const secondUnit = value.charCodeAt(index + 1)
+
+    if (secondUnit >= LOW_SURROGATE_MIN && secondUnit <= LOW_SURROGATE_MAX) {
+      return {
+        code: ((firstUnit - HIGH_SURROGATE_MIN) << 10) + (secondUnit - LOW_SURROGATE_MIN) + SURROGATE_OFFSET,
+        size: 2,
+        char: value.slice(index, index + 2),
+      }
+    }
+  }
+
+  return {
+    code: firstUnit,
+    size: 1,
+    char: value[index],
+  }
+}
+
 function escapeLeadingCharacter(char: string, nextChar: string | undefined, ignoreHead: boolean) {
   if (ignoreHead) {
     return char
@@ -36,7 +70,9 @@ export function escape(
   selectors: string,
   options?: EscapeOptions,
 ) {
-  if (selectors.length === 0) {
+  const length = selectors.length
+
+  if (length === 0) {
     return ''
   }
 
@@ -45,34 +81,69 @@ export function escape(
   const usingDefaultMap = map === DEFAULT_ESCAPE_MAPPING
 
   const sb: string[] = []
-  const characters = Array.from(selectors)
 
-  for (let index = 0; index < characters.length; index++) {
-    const char = characters[index]
-    const code = char.codePointAt(0)!
+  const firstView = readCodePoint(selectors, 0, length)
+  let cursor = firstView.size
+  const nextChar = cursor < length
+    ? readCodePoint(selectors, cursor, length).char
+    : undefined
 
-    if (code > MAX_ASCII_CHAR_CODE) {
-      sb.push(`u${code.toString(16)}`)
-      continue
+  if (usingDefaultMap) {
+    if (firstView.code > MAX_ASCII_CHAR_CODE) {
+      sb.push(`u${firstView.code.toString(16)}`)
+    }
+    else if (DEFAULT_ESCAPE_KEYS.has(firstView.char)) {
+      sb.push(DEFAULT_ESCAPE_MAPPING[firstView.char])
+    }
+    else {
+      sb.push(escapeLeadingCharacter(firstView.char, nextChar, ignoreHead))
     }
 
-    if (usingDefaultMap) {
-      if (DEFAULT_ESCAPE_KEYS.has(char)) {
-        sb.push(DEFAULT_ESCAPE_MAPPING[char])
+    while (cursor < length) {
+      const view = readCodePoint(selectors, cursor, length)
+      cursor += view.size
+
+      if (view.code > MAX_ASCII_CHAR_CODE) {
+        sb.push(`u${view.code.toString(16)}`)
         continue
       }
+
+      if (DEFAULT_ESCAPE_KEYS.has(view.char)) {
+        sb.push(DEFAULT_ESCAPE_MAPPING[view.char])
+        continue
+      }
+
+      sb.push(view.char)
     }
-    else if (hasOwnKey(map, char)) {
-      sb.push(map[char])
+
+    return sb.join('')
+  }
+
+  if (firstView.code > MAX_ASCII_CHAR_CODE) {
+    sb.push(`u${firstView.code.toString(16)}`)
+  }
+  else if (hasOwnKey(map, firstView.char)) {
+    sb.push(map[firstView.char])
+  }
+  else {
+    sb.push(escapeLeadingCharacter(firstView.char, nextChar, ignoreHead))
+  }
+
+  while (cursor < length) {
+    const view = readCodePoint(selectors, cursor, length)
+    cursor += view.size
+
+    if (view.code > MAX_ASCII_CHAR_CODE) {
+      sb.push(`u${view.code.toString(16)}`)
       continue
     }
 
-    if (index === 0) {
-      sb.push(escapeLeadingCharacter(char, characters[index + 1], ignoreHead))
+    if (hasOwnKey(map, view.char)) {
+      sb.push(map[view.char])
       continue
     }
 
-    sb.push(char)
+    sb.push(view.char)
   }
 
   return sb.join('')
