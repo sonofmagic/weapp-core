@@ -8,17 +8,12 @@ const shortSelector = 'btn-primary/active#icon[data-state=open]'
 const escapedShortLocal = escapeLocal(shortSelector)
 const escapedShort501 = escape501(shortSelector)
 
-const BENCH_CONFIG = {
-  time: 5000,
-  warmupTime: 500,
-}
-
 describe('@weapp-core/escape unescape short compare local vs 5.0.1', () => {
   bench('unescape short selector (local)', () => {
     unescapeLocal(escapedShortLocal)
-  }, BENCH_CONFIG)
+  })
 
   bench('unescape short selector (5.0.1)', () => {
     unescape501(escapedShort501)
-  }, BENCH_CONFIG)
+  })
 })

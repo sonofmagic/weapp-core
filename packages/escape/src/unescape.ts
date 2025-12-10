@@ -8,6 +8,10 @@ import {
 import { isAsciiNumber } from './predicates'
 import { decodeUnicodeSequence } from './unicode'
 
+const ESCAPE_PREFIX_CODE = ESCAPE_PREFIX.codePointAt(0)!
+const HYPHEN_CODE = HYPHEN.codePointAt(0)!
+const LOWER_U_CODE = 'u'.codePointAt(0)!
+
 const DEFAULT_UNESCAPE_TABLE = (() => {
   const inverse: Record<string, string> = {}
 
@@ -25,24 +29,32 @@ function unescapeDefault(value: string, ignoreHead: boolean) {
     return ''
   }
 
+  const hasLeadingEscape = !ignoreHead && value[0] === ESCAPE_PREFIX
+  const hasUnicodeMarker = value.includes('u')
+
+  if (!hasLeadingEscape && !hasUnicodeMarker) {
+    return value
+  }
+
   let cursor = 0
   let result = ''
 
   while (cursor < length) {
     const currentChar = value[cursor]
+    const currentCode = value.codePointAt(cursor)!
 
-    if (!ignoreHead && cursor === 0 && currentChar === ESCAPE_PREFIX) {
-      const nextChar = value[cursor + 1]
+    if (!ignoreHead && cursor === 0 && currentCode === ESCAPE_PREFIX_CODE) {
+      const nextCode = value.codePointAt(cursor + 1)
 
-      if (nextChar && isAsciiNumber(nextChar.codePointAt(0)!)) {
-        result += nextChar
+      if (nextCode !== undefined && isAsciiNumber(nextCode)) {
+        result += value[cursor + 1]
         cursor += 2
         continue
       }
 
-      if (nextChar === HYPHEN) {
-        const thirdChar = value[cursor + 2]
-        if (!thirdChar || isAsciiNumber(thirdChar.codePointAt(0)!)) {
+      if (nextCode === HYPHEN_CODE) {
+        const thirdCode = value.codePointAt(cursor + 2)
+        if (thirdCode === undefined || isAsciiNumber(thirdCode)) {
           result += HYPHEN
           cursor += 2
           continue
@@ -50,7 +62,7 @@ function unescapeDefault(value: string, ignoreHead: boolean) {
       }
     }
 
-    if (currentChar === 'u') {
+    if (currentCode === LOWER_U_CODE) {
       const decodedUnicode = decodeUnicodeSequence(value, cursor)
 
       if (decodedUnicode) {
@@ -133,19 +145,20 @@ export function unescape(
 
   while (cursor < length) {
     const currentChar = value[cursor]
+    const currentCode = value.codePointAt(cursor)!
 
-    if (!ignoreHead && cursor === 0 && currentChar === ESCAPE_PREFIX) {
-      const nextChar = value[cursor + 1]
+    if (!ignoreHead && cursor === 0 && currentCode === ESCAPE_PREFIX_CODE) {
+      const nextCode = value.codePointAt(cursor + 1)
 
-      if (nextChar && isAsciiNumber(nextChar.codePointAt(0)!)) {
-        result += nextChar
+      if (nextCode !== undefined && isAsciiNumber(nextCode)) {
+        result += value[cursor + 1]
         cursor += 2
         continue
       }
 
-      if (nextChar === HYPHEN) {
-        const thirdChar = value[cursor + 2]
-        if (!thirdChar || isAsciiNumber(thirdChar.codePointAt(0)!)) {
+      if (nextCode === HYPHEN_CODE) {
+        const thirdCode = value.codePointAt(cursor + 2)
+        if (thirdCode === undefined || isAsciiNumber(thirdCode)) {
           result += HYPHEN
           cursor += 2
           continue
@@ -153,7 +166,7 @@ export function unescape(
       }
     }
 
-    if (currentChar === 'u') {
+    if (currentCode === LOWER_U_CODE) {
       const decodedUnicode = decodeUnicodeSequence(value, cursor)
 
       if (decodedUnicode) {
@@ -163,9 +176,8 @@ export function unescape(
       }
     }
 
-    if (usingDefaultMap && currentChar === ESCAPE_PREFIX) {
-      const token = value.slice(cursor, cursor + 2)
-      const mapped = DEFAULT_UNESCAPE_TABLE[token]
+    if (usingDefaultMap && currentCode === ESCAPE_PREFIX_CODE) {
+      const mapped = DEFAULT_UNESCAPE_TABLE[value.slice(cursor, cursor + 2)]
 
       if (mapped !== undefined) {
         result += mapped
