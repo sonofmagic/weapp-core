@@ -1,5 +1,11 @@
 # @weapp-core/escape
 
+## 6.0.1
+
+### Patch Changes
+
+- [`be1b192`](https://github.com/sonofmagic/weapp-core/commit/be1b1920a05e3b9e2e9efc1d970330633eeb2648) Thanks [@sonofmagic](https://github.com/sonofmagic)! - 优化 escape/unescape 性能对齐分组基准，修复解码逻辑并保持行为一致。
+
 ## 6.0.0
 
 ### Major Changes
