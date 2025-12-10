@@ -8,7 +8,10 @@ import {
 } from './mapping'
 import { isAsciiNumber } from './predicates'
 
-const MAX_SINGLE_UNIT_CODE_POINT = 0xFFFF
+const HIGH_SURROGATE_MIN = 0xD800
+const HIGH_SURROGATE_MAX = 0xDBFF
+const LOW_SURROGATE_MIN = 0xDC00
+const LOW_SURROGATE_MAX = 0xDFFF
 
 const DEFAULT_ESCAPE_TABLE = (() => {
   const table: Array<string | undefined> = Array.from({ length: MAX_ASCII_CHAR_CODE + 1 })
@@ -19,6 +22,25 @@ const DEFAULT_ESCAPE_TABLE = (() => {
 
   return table
 })()
+
+function readCodePoint(str: string, index: number) {
+  const first = str.charCodeAt(index)
+
+  if (first < HIGH_SURROGATE_MIN || first > HIGH_SURROGATE_MAX || index + 1 >= str.length) {
+    return { codePoint: first, size: 1 }
+  }
+
+  const second = str.charCodeAt(index + 1)
+
+  if (second < LOW_SURROGATE_MIN || second > LOW_SURROGATE_MAX) {
+    return { codePoint: first, size: 1 }
+  }
+
+  return {
+    codePoint: ((first - HIGH_SURROGATE_MIN) << 10) + (second - LOW_SURROGATE_MIN) + 0x10000,
+    size: 2,
+  }
+}
 
 function escapeLeadingCharacter(char: string, nextChar: string | undefined, ignoreHead: boolean) {
   if (ignoreHead) {
@@ -57,94 +79,86 @@ export function escape(
   const ignoreHead = options?.ignoreHead ?? false
   const usingDefaultMap = map === DEFAULT_ESCAPE_MAPPING
 
-  const sb: string[] = []
-
   let cursor = 0
-  const firstCode = selectors.codePointAt(0)!
-  const firstSize = firstCode > MAX_SINGLE_UNIT_CODE_POINT ? 2 : 1
-  cursor = firstSize
-
-  const firstChar = firstSize === 1 ? selectors[0] : selectors.slice(0, firstSize)
-
-  const nextCode = cursor < length ? selectors.codePointAt(cursor)! : undefined
-  const nextSize = nextCode !== undefined && nextCode > MAX_SINGLE_UNIT_CODE_POINT ? 2 : 1
-  const nextChar = nextCode === undefined
-    ? undefined
-    : selectors.slice(cursor, cursor + nextSize)
-
-  if (usingDefaultMap) {
-    if (firstCode > MAX_ASCII_CHAR_CODE) {
-      sb.push(`u${firstCode.toString(16)}`)
-    }
-    else {
-      const mapped = DEFAULT_ESCAPE_TABLE[firstCode]
-
-      if (mapped !== undefined) {
-        sb.push(mapped)
-      }
-      else {
-        sb.push(escapeLeadingCharacter(firstChar, nextChar, ignoreHead))
-      }
-    }
-
-    while (cursor < length) {
-      const code = selectors.codePointAt(cursor)!
-      const size = code > MAX_SINGLE_UNIT_CODE_POINT ? 2 : 1
-      const char = size === 1
-        ? selectors[cursor]
-        : selectors.slice(cursor, cursor + size)
-
-      cursor += size
-
-      if (code > MAX_ASCII_CHAR_CODE) {
-        sb.push(`u${code.toString(16)}`)
-        continue
-      }
-
-      const mapped = DEFAULT_ESCAPE_TABLE[code]
-
-      if (mapped !== undefined) {
-        sb.push(mapped)
-        continue
-      }
-
-      sb.push(char)
-    }
-
-    return sb.join('')
-  }
-
-  if (firstCode > MAX_ASCII_CHAR_CODE) {
-    sb.push(`u${firstCode.toString(16)}`)
-  }
-  else if (hasOwnKey(map, firstChar)) {
-    sb.push(map[firstChar])
-  }
-  else {
-    sb.push(escapeLeadingCharacter(firstChar, nextChar, ignoreHead))
-  }
+  let lastUnchangedIndex = 0
+  let buffer: string[] | undefined
 
   while (cursor < length) {
-    const code = selectors.codePointAt(cursor)!
-    const size = code > MAX_SINGLE_UNIT_CODE_POINT ? 2 : 1
-    const char = size === 1
-      ? selectors[cursor]
-      : selectors.slice(cursor, cursor + size)
+    const { codePoint, size } = readCodePoint(selectors, cursor)
+    const isHead = cursor === 0
+    let replacement: string | undefined
+
+    if (codePoint > MAX_ASCII_CHAR_CODE) {
+      replacement = `u${codePoint.toString(16)}`
+    }
+    else if (usingDefaultMap) {
+      if (isHead) {
+        const mapped = DEFAULT_ESCAPE_TABLE[codePoint]
+
+        if (mapped !== undefined) {
+          replacement = mapped
+        }
+        else {
+          const nextIndex = cursor + size
+          const next = nextIndex < length ? readCodePoint(selectors, nextIndex) : undefined
+          const char = selectors[cursor]
+          const nextChar = next
+            ? selectors.slice(nextIndex, nextIndex + next.size)
+            : undefined
+          const escapedHead = escapeLeadingCharacter(char, nextChar, ignoreHead)
+          if (escapedHead !== char) {
+            replacement = escapedHead
+          }
+        }
+      }
+      else {
+        const mapped = DEFAULT_ESCAPE_TABLE[codePoint]
+        if (mapped !== undefined) {
+          replacement = mapped
+        }
+      }
+    }
+    else {
+      const char = selectors[cursor]
+      const mapped = hasOwnKey(map, char) ? map[char] : undefined
+
+      if (mapped !== undefined) {
+        replacement = mapped
+      }
+      else if (isHead) {
+        const nextIndex = cursor + size
+        const next = nextIndex < length ? readCodePoint(selectors, nextIndex) : undefined
+        const nextChar = next
+          ? selectors.slice(nextIndex, nextIndex + next.size)
+          : undefined
+        const escapedHead = escapeLeadingCharacter(char, nextChar, ignoreHead)
+        if (escapedHead !== char) {
+          replacement = escapedHead
+        }
+      }
+    }
+
+    if (replacement !== undefined) {
+      if (!buffer) {
+        buffer = []
+      }
+      if (lastUnchangedIndex !== cursor) {
+        buffer.push(selectors.slice(lastUnchangedIndex, cursor))
+      }
+      buffer.push(replacement)
+      lastUnchangedIndex = cursor + size
+    }
 
     cursor += size
-
-    if (code > MAX_ASCII_CHAR_CODE) {
-      sb.push(`u${code.toString(16)}`)
-      continue
-    }
-
-    if (hasOwnKey(map, char)) {
-      sb.push(map[char])
-      continue
-    }
-
-    sb.push(char)
   }
 
-  return sb.join('')
+  if (!buffer) {
+    return selectors
+  }
+
+  if (lastUnchangedIndex < length) {
+    buffer.push(selectors.slice(lastUnchangedIndex))
+  }
+
+  return buffer.join('')
 }

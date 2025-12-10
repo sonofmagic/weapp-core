@@ -2,6 +2,7 @@ import type { UnescapeOptions } from './types'
 import { ESCAPE_PREFIX, HYPHEN } from './internal-constants'
 import {
   createInverseMapping,
+  createTokenBuckets,
   createUnescapeMapping,
   DEFAULT_ESCAPE_MAPPING,
 } from './mapping'
@@ -9,7 +10,6 @@ import { isAsciiNumber } from './predicates'
 import { decodeUnicodeSequence } from './unicode'
 
 const ESCAPE_PREFIX_CODE = ESCAPE_PREFIX.codePointAt(0)!
-const HYPHEN_CODE = HYPHEN.codePointAt(0)!
 const LOWER_U_CODE = 'u'.codePointAt(0)!
 
 const DEFAULT_UNESCAPE_TABLE = (() => {
@@ -25,10 +25,6 @@ const DEFAULT_UNESCAPE_TABLE = (() => {
 function unescapeDefault(value: string, ignoreHead: boolean) {
   const length = value.length
 
-  if (length === 0) {
-    return ''
-  }
-
   const hasLeadingEscape = !ignoreHead && value[0] === ESCAPE_PREFIX
   const hasUnicodeMarker = value.includes('u')
 
@@ -42,25 +38,6 @@ function unescapeDefault(value: string, ignoreHead: boolean) {
   while (cursor < length) {
     const currentChar = value[cursor]
     const currentCode = value.codePointAt(cursor)!
-
-    if (!ignoreHead && cursor === 0 && currentCode === ESCAPE_PREFIX_CODE) {
-      const nextCode = value.codePointAt(cursor + 1)
-
-      if (nextCode !== undefined && isAsciiNumber(nextCode)) {
-        result += value[cursor + 1]
-        cursor += 2
-        continue
-      }
-
-      if (nextCode === HYPHEN_CODE) {
-        const thirdCode = value.codePointAt(cursor + 2)
-        if (thirdCode === undefined || isAsciiNumber(thirdCode)) {
-          result += HYPHEN
-          cursor += 2
-          continue
-        }
-      }
-    }
 
     if (currentCode === LOWER_U_CODE) {
       const decodedUnicode = decodeUnicodeSequence(value, cursor)
@@ -113,102 +90,80 @@ export function unescape(
   }
 
   const usingDefaultMap = map === DEFAULT_ESCAPE_MAPPING
-  const mappingForInverse = map || (usingDefaultMap
-    ? DEFAULT_ESCAPE_MAPPING
-    : undefined)
-  const { inverse, tokens } = mappingForInverse
-    ? createInverseMapping(mappingForInverse)
-    : { inverse: {} as Record<string, string>, tokens: [] as string[] }
-
-  const tokenBuckets = usingDefaultMap || tokens.length === 0
+  const { inverse, tokens } = usingDefaultMap
+    ? { inverse: {} as Record<string, string>, tokens: [] as string[] }
+    : createInverseMapping(map)
+  const tokenBuckets = usingDefaultMap
     ? undefined
-    : tokens.reduce<Record<string, string[]>>((acc, token) => {
-        if (!token) {
-          return acc
-        }
-
-        const first = token[0]
-        const bucket = acc[first]
-
-        if (bucket) {
-          bucket.push(token)
-        }
-        else {
-          acc[first] = [token]
-        }
-
-        return acc
-      }, {})
+    : createTokenBuckets(map, tokens)
 
   let cursor = 0
-  let result = ''
+  let lastUnchangedIndex = 0
+  let buffer: string[] | undefined
 
   while (cursor < length) {
+    const currentCode = value.charCodeAt(cursor)
     const currentChar = value[cursor]
-    const currentCode = value.codePointAt(cursor)!
+    let replacement: string | undefined
+    let advance = 1
 
-    if (!ignoreHead && cursor === 0 && currentCode === ESCAPE_PREFIX_CODE) {
-      const nextCode = value.codePointAt(cursor + 1)
-
-      if (nextCode !== undefined && isAsciiNumber(nextCode)) {
-        result += value[cursor + 1]
-        cursor += 2
-        continue
-      }
-
-      if (nextCode === HYPHEN_CODE) {
-        const thirdCode = value.codePointAt(cursor + 2)
-        if (thirdCode === undefined || isAsciiNumber(thirdCode)) {
-          result += HYPHEN
-          cursor += 2
-          continue
-        }
-      }
-    }
-
-    if (currentCode === LOWER_U_CODE) {
+    if (replacement === undefined && currentCode === LOWER_U_CODE) {
       const decodedUnicode = decodeUnicodeSequence(value, cursor)
 
       if (decodedUnicode) {
-        result += decodedUnicode.char
-        cursor += decodedUnicode.length
-        continue
+        replacement = decodedUnicode.char
+        advance = decodedUnicode.length
       }
     }
 
-    if (usingDefaultMap && currentCode === ESCAPE_PREFIX_CODE) {
-      const mapped = DEFAULT_UNESCAPE_TABLE[value.slice(cursor, cursor + 2)]
+    if (replacement === undefined) {
+      if (usingDefaultMap && currentCode === ESCAPE_PREFIX_CODE) {
+        const mapped = DEFAULT_UNESCAPE_TABLE[value.slice(cursor, cursor + 2)]
 
-      if (mapped !== undefined) {
-        result += mapped
-        cursor += 2
-        continue
+        if (mapped !== undefined) {
+          replacement = mapped
+          advance = 2
+        }
       }
-    }
-    else if (tokenBuckets) {
-      const bucket = tokenBuckets[currentChar]
+      else if (tokenBuckets) {
+        const bucket = tokenBuckets[currentChar]
 
-      if (bucket) {
-        let matchedToken = false
-
-        for (const token of bucket) {
-          if (value.startsWith(token, cursor)) {
-            result += inverse[token]
-            cursor += token.length
-            matchedToken = true
-            break
+        if (bucket) {
+          for (const token of bucket) {
+            if (value.startsWith(token, cursor)) {
+              replacement = inverse[token]
+              advance = token.length
+              break
+            }
           }
         }
-
-        if (matchedToken) {
-          continue
-        }
       }
     }
 
-    result += currentChar
-    cursor++
+    if (replacement !== undefined) {
+      if (!buffer) {
+        buffer = []
+      }
+      if (lastUnchangedIndex !== cursor) {
+        buffer.push(value.slice(lastUnchangedIndex, cursor))
+      }
+      buffer.push(replacement)
+      lastUnchangedIndex = cursor + advance
+      cursor += advance
+      continue
+    }
+
+    cursor += 1
   }
+
+  const result = buffer
+    ? (() => {
+        if (lastUnchangedIndex < length) {
+          buffer!.push(value.slice(lastUnchangedIndex))
+        }
+        return buffer!.join('')
+      })()
+    : value
 
   if (ignoreHead || result.length === 0 || !result.startsWith(ESCAPE_PREFIX)) {
     return result

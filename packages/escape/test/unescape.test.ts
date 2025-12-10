@@ -81,6 +81,14 @@ describe('unescape', () => {
     expect(unescape('_-ab')).toBe('_-ab')
   })
 
+  it('should decode leading hyphen sequences when map is provided but empty', () => {
+    expect(unescape('_-1', { map: {} })).toBe('-1')
+  })
+
+  it('should strip leading underscores before digits when map is provided', () => {
+    expect(unescape('_1', { map: {} })).toBe('1')
+  })
+
   it('should decode default mapping tokens when map is provided explicitly', () => {
     expect(unescape('_b', { map: ComplexMap })).toBe('[')
   })
@@ -101,6 +109,19 @@ describe('unescape', () => {
 
   it('should keep leading underscores when ignoreHead is true', () => {
     expect(unescape('_1', { ignoreHead: true })).toBe('_1')
+  })
+
+  it('should decode unicode sequences when map is provided', () => {
+    const map = { a: '_a' }
+    expect(unescape('u1f60a', { map })).toBe('😊')
+  })
+
+  it('should ignore invalid unicode markers when map is provided', () => {
+    expect(unescape('uz', { map: {} })).toBe('uz')
+  })
+
+  it('should leave unknown default tokens untouched when map is provided', () => {
+    expect(unescape('__', { map: ComplexMap })).toBe('__')
   })
 
   it('should skip empty tokens when decoding', () => {

@@ -4,6 +4,7 @@ import {
   COMPLEX_ESCAPE_MAPPING,
   createEscapeMapping,
   createInverseMapping,
+  createTokenBuckets,
   createUnescapeMapping,
   DEFAULT_ESCAPE_KEYS,
   DEFAULT_ESCAPE_MAPPING,
@@ -46,6 +47,10 @@ describe('mapping', () => {
       const { inverse } = createInverseMapping(COMPLEX_ESCAPE_MAPPING)
       expect(inverse._ch).toBe('#')
     }).not.toThrow()
+  })
+
+  it('should return undefined token buckets when tokens are empty', () => {
+    expect(createTokenBuckets({}, [])).toBeUndefined()
   })
 
   it('should keep unescape mapping identical to the custom value', () => {

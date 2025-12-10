@@ -10,6 +10,7 @@ export const COMPLEX_ESCAPE_MAPPING = ComplexMappingChars2String as EscapeMappin
 export const DEFAULT_ESCAPE_KEYS = new Set(Object.keys(DEFAULT_ESCAPE_MAPPING))
 
 const escapeMappingCache = new WeakMap<EscapeMapping, EscapeMapping>()
+const tokenBucketCache = new WeakMap<Record<string, string>, Record<string, string[]>>()
 
 export interface InverseMappingResult {
   inverse: Record<string, string>
@@ -76,6 +77,40 @@ export function createInverseMapping(mapping: Record<string, string>) {
   inverseMappingCache.set(mapping, built)
 
   return built
+}
+
+export function createTokenBuckets(mapping: Record<string, string>, tokens: string[]) {
+  if (tokens.length === 0) {
+    return undefined
+  }
+
+  const cached = tokenBucketCache.get(mapping)
+
+  if (cached) {
+    return cached
+  }
+
+  const buckets = tokens.reduce<Record<string, string[]>>((acc, token) => {
+    if (!token) {
+      return acc
+    }
+
+    const first = token[0]
+    const bucket = acc[first]
+
+    if (bucket) {
+      bucket.push(token)
+    }
+    else {
+      acc[first] = [token]
+    }
+
+    return acc
+  }, {})
+
+  tokenBucketCache.set(mapping, buckets)
+
+  return buckets
 }
 
 export function primeInverseCache(mapping: Record<string, string>) {

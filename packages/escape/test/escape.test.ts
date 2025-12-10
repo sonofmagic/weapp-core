@@ -26,6 +26,10 @@ describe('escape', () => {
     expect(escape('-', { ignoreHead: true })).toBe('-')
   })
 
+  it('should keep leading digits untouched when ignoreHead is true', () => {
+    expect(escape('1abc', { ignoreHead: true })).toBe('1abc')
+  })
+
   it('should escape leading hyphen followed by digits', () => {
     expect(escape('-12345')).toBe('_-12345')
     expect(escape('-12345', { ignoreHead: true })).toBe('-12345')
@@ -38,6 +42,21 @@ describe('escape', () => {
 
   it('should escape mapped characters using custom map', () => {
     expect(escape('abc', { map: { a: 'A', b: 'B' } })).toBe('ABc')
+  })
+
+  it('should handle unmapped leading ascii when custom map is provided', () => {
+    const map = { '[': 'customL' }
+    expect(escape('b😊', { map })).toBe('bu1f60a')
+  })
+
+  it('should escape leading digits when custom map is provided', () => {
+    const map = { '[': 'customL' }
+    expect(escape('1a', { map })).toBe('_1a')
+  })
+
+  it('should escape solo leading digits when custom map is provided', () => {
+    const map = { '[': 'customL' }
+    expect(escape('1', { map })).toBe('_1')
   })
 
   it('should escape unicode when using custom map', () => {
