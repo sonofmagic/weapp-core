@@ -81,6 +81,10 @@ describe('unescape', () => {
     expect(unescape('_-ab')).toBe('_-ab')
   })
 
+  it('should decode default mapping tokens when map is provided explicitly', () => {
+    expect(unescape('_b', { map: ComplexMap })).toBe('[')
+  })
+
   it('should prefer longer tokens when decoding overlapping map outputs', () => {
     const map = {
       a: '_',

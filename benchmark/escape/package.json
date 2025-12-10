@@ -4,7 +4,10 @@
   "private": true,
   "packageManager": "pnpm@10.25.0",
   "scripts": {
-    "bench": "vitest bench"
+    "bench": "vitest bench",
+    "bench:escape:short": "vitest bench escape-short.bench.ts",
+    "bench:escape:long": "vitest bench escape-long.bench.ts",
+    "bench:unescape": "vitest bench unescape.bench.ts"
   },
   "dependencies": {
     "escape-5-0-1": "npm:@weapp-core/escape@5.0.1"
