@@ -1,0 +1,16 @@
+{
+  "name": "escape-benchmark",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.25.0",
+  "scripts": {
+    "bench": "vitest bench"
+  },
+  "dependencies": {
+    "escape-5-0-1": "npm:@weapp-core/escape@5.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}

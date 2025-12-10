@@ -1,6 +1,7 @@
 packages:
   - apps/*
   - packages/*
+  - benchmark/*
   - "!**/test/**"
 onlyBuiltDependencies:
   - "@tailwindcss/oxide"

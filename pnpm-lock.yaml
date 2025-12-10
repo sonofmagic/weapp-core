@@ -159,6 +159,19 @@ importers:
         specifier: ^2.8.2
         version: 2.8.2
 
+  benchmark/escape:
+    dependencies:
+      escape-5-0-1:
+        specifier: npm:@weapp-core/escape@5.0.1
+        version: '@weapp-core/escape@5.0.1'
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.15(@types/node@24.10.2)(jiti@2.6.1)(jsdom@24.1.0)(terser@5.31.2)(tsx@4.21.0)(yaml@2.8.2)
+
   packages/escape: {}
 
   packages/fetch:
@@ -2661,6 +2674,9 @@ packages:
 
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
+
+  '@weapp-core/escape@5.0.1':
+    resolution: {integrity: sha512-BIHEQvlqWU+ofCdh+w08wzV9GjS+5Nw5Rf6XGxni5/15srShdcRPbSWpDAw00toTJkJDG4+UNjzOB+rHdcxCdg==}
 
   '@yarnpkg/fslib@3.1.4':
     resolution: {integrity: sha512-Yyguw5RM+xI1Bv0RFbs1ZF5HwU+9/He4YT7yeT722yAlLfkz9IzZHO6a5yStEshxiliPn9Fdj4H54a785xpK/g==}
@@ -10414,6 +10430,8 @@ snapshots:
       '@vue/shared': 3.5.13
 
   '@vue/shared@3.5.13': {}
+
+  '@weapp-core/escape@5.0.1': {}
 
   '@yarnpkg/fslib@3.1.4':
     dependencies:
