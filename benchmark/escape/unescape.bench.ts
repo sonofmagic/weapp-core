@@ -9,23 +9,7 @@ const repeatedSelector = Array.from({ length: 32 }, () => shortSelector).join(' 
 const escapedRepeatedLocal = escapeLocal(repeatedSelector)
 const escapedRepeated501 = escape501(repeatedSelector)
 
-describe('@weapp-core/escape compare local vs 5.0.1', () => {
-  bench('escape short selector (local)', () => {
-    escapeLocal(shortSelector)
-  })
-
-  bench('escape short selector (5.0.1)', () => {
-    escape501(shortSelector)
-  })
-
-  bench('escape long selector (local)', () => {
-    escapeLocal(repeatedSelector)
-  })
-
-  bench('escape long selector (5.0.1)', () => {
-    escape501(repeatedSelector)
-  })
-
+describe('@weapp-core/escape unescape compare local vs 5.0.1', () => {
   bench('unescape long selector (local)', () => {
     unescapeLocal(escapedRepeatedLocal)
   })

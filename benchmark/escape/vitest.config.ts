@@ -2,9 +2,10 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
-    include: ['escape.compare.bench.ts'],
+    // keep this project out of the regular test run
+    include: [],
     benchmark: {
-      time: 1,
+      include: ['*.bench.ts'],
     },
   },
 })
