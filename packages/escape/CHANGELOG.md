@@ -1,5 +1,11 @@
 # @weapp-core/escape
 
+## 7.0.0
+
+### Major Changes
+
+- 🚀 **调整 Unicode 转义格式为 `u_x<hex>_`，避免普通单词被误解码，并补充边界与类型测试。** [`18267dd`](https://github.com/sonofmagic/weapp-core/commit/18267ddf6713651f4a77a97e78b49b59e317774c) by @sonofmagic
+
 ## 6.0.1
 
 ### Patch Changes
