@@ -141,4 +141,11 @@ describe('unescape', () => {
     }
     expect(unescape('_', { map })).toBe('')
   })
+
+  it('should keep Tailwind-style class lists unchanged', () => {
+    const source = 'w-full rounded-full bg-success p-1'
+    const escaped = escape(source)
+    expect(escaped).toBe(source)
+    expect(unescape(escaped)).toBe(source)
+  })
 })
