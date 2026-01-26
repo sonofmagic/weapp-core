@@ -96,6 +96,10 @@ export function createTokenBuckets(mapping: Record<string, string>, tokens: stri
     }
 
     const first = token[0]
+    if (!first) {
+      return acc
+    }
+
     const bucket = acc[first]
 
     if (bucket) {

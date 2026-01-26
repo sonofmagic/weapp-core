@@ -30,15 +30,15 @@ describe('unescape', () => {
   })
 
   it('should keep non-hex unicode markers untouched', () => {
-    expect(unescape('u-')).toBe('u-')
+    expect(unescape('u_x-')).toBe('u_x-')
   })
 
   it('should ignore ascii unicode escapes', () => {
-    expect(unescape('u61')).toBe('u61')
+    expect(unescape('u_x61_')).toBe('u_x61_')
   })
 
   it('should decode uppercase unicode sequences', () => {
-    expect(unescape('u00AF')).toBe('\u00AF')
+    expect(unescape('u_x00AF_')).toBe('\u00AF')
   })
 
   it('should restore leading hyphen cases', () => {
@@ -104,7 +104,19 @@ describe('unescape', () => {
 
   it('should decode the maximum unicode code point sequence', () => {
     const maxCodePointChar = String.fromCodePoint(0x10FFFF)
-    expect(unescape('u10ffff')).toBe(maxCodePointChar)
+    expect(unescape('u_x10ffff_')).toBe(maxCodePointChar)
+  })
+
+  it('should ignore unicode sequences above the maximum code point', () => {
+    expect(unescape('u_x110000_')).toBe('u_x110000_')
+  })
+
+  it('should ignore unicode sequences without trailing underscore', () => {
+    expect(unescape('u_x1f60a')).toBe('u_x1f60a')
+  })
+
+  it('should ignore unicode sequences at or below ASCII range', () => {
+    expect(unescape('u_x7f_')).toBe('u_x7f_')
   })
 
   it('should keep leading underscores when ignoreHead is true', () => {
@@ -113,11 +125,11 @@ describe('unescape', () => {
 
   it('should decode unicode sequences when map is provided', () => {
     const map = { a: '_a' }
-    expect(unescape('u1f60a', { map })).toBe('😊')
+    expect(unescape('u_x1f60a_', { map })).toBe('😊')
   })
 
   it('should ignore invalid unicode markers when map is provided', () => {
-    expect(unescape('uz', { map: {} })).toBe('uz')
+    expect(unescape('u_x1g_', { map: {} })).toBe('u_x1g_')
   })
 
   it('should leave unknown default tokens untouched when map is provided', () => {

@@ -35,17 +35,19 @@ describe('mapping', () => {
   it('should provide sorted inverse mapping tokens', () => {
     const map = { a: '_', b: '__' }
     const { tokens, inverse } = createInverseMapping(map)
+    const typedInverse = inverse as Record<'_' | '__', string>
 
     expect(tokens).toEqual(['__', '_'])
-    expect(inverse._).toBe('a')
-    expect(inverse.__).toBe('b')
+    expect(typedInverse._).toBe('a')
+    expect(typedInverse.__).toBe('b')
   })
 
   it('should allow priming complex mapping cache without errors', () => {
     expect(() => {
       primeInverseCache(COMPLEX_ESCAPE_MAPPING)
       const { inverse } = createInverseMapping(COMPLEX_ESCAPE_MAPPING)
-      expect(inverse._ch).toBe('#')
+      const typedInverse = inverse as Record<'_ch', string>
+      expect(typedInverse._ch).toBe('#')
     }).not.toThrow()
   })
 
@@ -60,7 +62,7 @@ describe('mapping', () => {
   })
 
   it('hasOwnKey should honor prototype-less objects', () => {
-    const obj = Object.create(null) as Record<string, string>
+    const obj = Object.create(null) as Record<'foo', string>
     obj.foo = 'bar'
     expect(hasOwnKey(obj, 'foo')).toBe(true)
     expect(hasOwnKey(obj, 'toString')).toBe(false)

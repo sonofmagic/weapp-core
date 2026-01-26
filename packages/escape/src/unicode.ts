@@ -1,6 +1,7 @@
 import { MAX_ASCII_CHAR_CODE } from './constants'
 
-const UNICODE_PREFIX = 'u'
+const UNICODE_PREFIX = 'u_x'
+const UNICODE_SUFFIX = '_'
 const HEX_RADIX = 16
 
 function isHexDigit(char: string) {
@@ -19,11 +20,11 @@ export interface DecodedUnicodeSequence {
 }
 
 export function decodeUnicodeSequence(value: string, index: number): DecodedUnicodeSequence | undefined {
-  if (value[index] !== UNICODE_PREFIX) {
+  if (!value.startsWith(UNICODE_PREFIX, index)) {
     return undefined
   }
 
-  let cursor = index + 1
+  let cursor = index + UNICODE_PREFIX.length
   while (cursor < value.length) {
     const nextChar = value[cursor]
     if (!nextChar || !isHexDigit(nextChar)) {
@@ -32,19 +33,23 @@ export function decodeUnicodeSequence(value: string, index: number): DecodedUnic
     cursor += 1
   }
 
-  if (cursor === index + 1) {
+  if (cursor === index + UNICODE_PREFIX.length) {
     return undefined
   }
 
-  const hex = value.slice(index + 1, cursor)
+  if (cursor >= value.length || value[cursor] !== UNICODE_SUFFIX) {
+    return undefined
+  }
+
+  const hex = value.slice(index + UNICODE_PREFIX.length, cursor)
   const codePoint = Number.parseInt(hex, HEX_RADIX)
 
-  if (Number.isNaN(codePoint) || codePoint <= MAX_ASCII_CHAR_CODE) {
+  if (Number.isNaN(codePoint) || codePoint <= MAX_ASCII_CHAR_CODE || codePoint > 0x10FFFF) {
     return undefined
   }
 
   return {
     char: String.fromCodePoint(codePoint),
-    length: cursor - index,
+    length: cursor - index + 1,
   }
 }

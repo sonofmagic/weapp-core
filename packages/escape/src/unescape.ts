@@ -26,7 +26,7 @@ function unescapeDefault(value: string, ignoreHead: boolean) {
   const length = value.length
 
   const hasLeadingEscape = !ignoreHead && value[0] === ESCAPE_PREFIX
-  const hasUnicodeMarker = value.includes('u')
+  const hasUnicodeMarker = value.includes('u_x')
 
   if (!hasLeadingEscape && !hasUnicodeMarker) {
     return value
@@ -36,7 +36,7 @@ function unescapeDefault(value: string, ignoreHead: boolean) {
   let result = ''
 
   while (cursor < length) {
-    const currentChar = value[cursor]
+    const currentChar = value[cursor]!
     const currentCode = value.codePointAt(cursor)!
 
     if (currentCode === LOWER_U_CODE) {
@@ -103,7 +103,7 @@ export function unescape(
 
   while (cursor < length) {
     const currentCode = value.charCodeAt(cursor)
-    const currentChar = value[cursor]
+    const currentChar = value[cursor]!
     let replacement: string | undefined
     let advance = 1
 

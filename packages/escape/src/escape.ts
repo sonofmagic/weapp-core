@@ -89,7 +89,7 @@ export function escape(
     let replacement: string | undefined
 
     if (codePoint > MAX_ASCII_CHAR_CODE) {
-      replacement = `u${codePoint.toString(16)}`
+      replacement = `u_x${codePoint.toString(16)}_`
     }
     else if (usingDefaultMap) {
       if (isHead) {
@@ -101,7 +101,7 @@ export function escape(
         else {
           const nextIndex = cursor + size
           const next = nextIndex < length ? readCodePoint(selectors, nextIndex) : undefined
-          const char = selectors[cursor]
+          const char = selectors[cursor]!
           const nextChar = next
             ? selectors.slice(nextIndex, nextIndex + next.size)
             : undefined
@@ -119,7 +119,7 @@ export function escape(
       }
     }
     else {
-      const char = selectors[cursor]
+      const char = selectors[cursor]!
       const mapped = hasOwnKey(map, char) ? map[char] : undefined
 
       if (mapped !== undefined) {

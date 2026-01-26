@@ -35,6 +35,7 @@
     "build": "unbuild",
     "test": "vitest run --coverage.enabled",
     "test:dev": "vitest --coverage.enabled",
+    "test:types": "unbuild && tsd --files test/types.test-d.ts",
     "release": "pnpm publish"
   },
   "publishConfig": {
