@@ -1,23 +1,24 @@
-import { expectAssignable, expectError, expectType } from 'tsd'
+/* eslint-disable antfu/no-import-dist */
+import type { EscapeOptions, MappingStringDictionary, SYMBOL_TABLE_TYPE, SYMBOL_TABLE_TYPE_VALUES, UnescapeOptions } from '../dist'
 
+import { expectAssignable, expectError, expectType } from 'tsd'
 import {
   ComplexMappingChars2String,
   ComplexMappingChars2StringEntries,
-  MappingChars2String,
-  MappingChars2StringEntries,
-  MAX_ASCII_CHAR_CODE,
-  SYMBOL_TABLE,
   escape,
+
   isAllowedClassName,
   isAsciiNumber,
+  MappingChars2String,
+  MappingChars2StringEntries,
+
+  MAX_ASCII_CHAR_CODE,
+  SYMBOL_TABLE,
+
   toEscapeOptions,
   toUnescapeOptions,
   unescape,
-  type EscapeOptions,
-  type MappingStringDictionary,
-  type SYMBOL_TABLE_TYPE,
-  type SYMBOL_TABLE_TYPE_VALUES,
-  type UnescapeOptions,
+
 } from '../dist'
 
 expectType<string>(escape('abc'))
