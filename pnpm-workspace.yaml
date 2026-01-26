@@ -2,9 +2,10 @@ packages:
   - apps/*
   - packages/*
   - benchmark/*
-  - "!**/test/**"
+  - '!**/test/**'
+  - templates/*
 onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
+  - '@tailwindcss/oxide'
   - esbuild
   - sharp
   - workerd
