@@ -20,22 +20,27 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "unbuild",
+    "build": "tsdown",
     "test": "vitest run --coverage.enabled",
     "test:dev": "vitest --coverage.enabled",
-    "test:types": "unbuild && tsd --files test/types.test-d.ts",
+    "test:types": "tsdown && tsd --files test/types.test-d.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
     "release": "pnpm publish"
   },

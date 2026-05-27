@@ -1,5 +1,4 @@
-/* eslint-disable antfu/no-import-dist */
-import type { EscapeOptions, MappingStringDictionary, SYMBOL_TABLE_TYPE, SYMBOL_TABLE_TYPE_VALUES, UnescapeOptions } from '../dist'
+import type { EscapeOptions, MappingStringDictionary, SYMBOL_TABLE_TYPE, SYMBOL_TABLE_TYPE_VALUES, UnescapeOptions } from '..'
 
 import { expectAssignable, expectError, expectType } from 'tsd'
 import {
@@ -19,7 +18,7 @@ import {
   toUnescapeOptions,
   unescape,
 
-} from '../dist'
+} from '..'
 
 expectType<string>(escape('abc'))
 expectType<string>(escape('1abc', { ignoreHead: true }))
