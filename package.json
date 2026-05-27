@@ -21,6 +21,7 @@
     "test": "vitest run --coverage.enabled",
     "test:dev": "vitest --coverage.enabled",
     "test:types": "pnpm --filter @weapp-core/escape test:types",
+    "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "release": "changeset",
     "publish-packages": "turbo run build lint --filter=@weapp-core/escape && npm run test && changeset version && changeset publish",

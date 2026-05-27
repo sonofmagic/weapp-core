@@ -36,14 +36,14 @@ expectType<EscapeOptions>(toEscapeOptions({ ignoreHead: true }))
 expectType<UnescapeOptions>(toUnescapeOptions())
 expectType<UnescapeOptions>(toUnescapeOptions({ map: MappingChars2String }))
 
-expectType<number>(MAX_ASCII_CHAR_CODE)
+expectType<127>(MAX_ASCII_CHAR_CODE)
 expectAssignable<MappingStringDictionary>(MappingChars2String)
 expectAssignable<MappingStringDictionary>(ComplexMappingChars2String)
 expectType<Array<[string, string]>>(MappingChars2StringEntries)
 expectType<Array<[string, string]>>(ComplexMappingChars2StringEntries)
 
 expectType<SYMBOL_TABLE_TYPE>(SYMBOL_TABLE)
-expectType<SYMBOL_TABLE_TYPE_VALUES>(SYMBOL_TABLE.DOT)
+expectType<'.'>(SYMBOL_TABLE.DOT)
 
 expectError(escape(123))
 expectError(unescape(123))

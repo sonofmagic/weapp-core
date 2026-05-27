@@ -22,11 +22,11 @@ const commonSelectors = [
   '.btn--ghost',
   '.link[href*="utm_source"]',
   '.tag[data-variant="warning"]',
-]
+] as const
 
 // 95% common selectors, ~5% leading hyphen/digit.
 const weightedSelectors = [
-  ...Array.from({ length: 38 }, (_, index) => commonSelectors[index % commonSelectors.length]),
+  ...Array.from({ length: 38 }, (_, index) => commonSelectors[index % commonSelectors.length]!),
   '-leading-hyphen',
   '1leading-digit',
 ]

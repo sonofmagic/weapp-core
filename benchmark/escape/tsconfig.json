@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [
+    "*.bench.ts",
+    "vitest.config.ts"
+  ]
+}

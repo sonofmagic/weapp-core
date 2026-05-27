@@ -36,6 +36,7 @@
     "test": "vitest run --coverage.enabled",
     "test:dev": "vitest --coverage.enabled",
     "test:types": "unbuild && tsd --files test/types.test-d.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
     "release": "pnpm publish"
   },
   "publishConfig": {
