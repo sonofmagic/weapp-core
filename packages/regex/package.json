@@ -1,7 +1,7 @@
 {
   "name": "@weapp-core/regex",
   "type": "commonjs",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "weapp regex utils",
   "author": "ice breaker <1324318532@qq.com>",
   "license": "MIT",
