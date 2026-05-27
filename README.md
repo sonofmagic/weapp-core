@@ -3,11 +3,7 @@
 ## Projects
 
 - [@weapp-core/escape](packages/escape) - escape class name in weapp
-- [@weapp-core/http](packages/http) - weapp http global object
 - [@weapp-core/regex](packages/regex) - weapp regex utils
-- [@weapp-core/runtime-injector](packages/runtime-injector) - runtime-injector
-- [weapp-websocket](packages/websocket) - weapp-websocket
-- [weapp-xmlhttprequest](packages/xmlhttprequest) - weapp-xmlhttprequest
 
 ## Contributing
 

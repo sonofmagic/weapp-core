@@ -180,37 +180,7 @@ importers:
 
   packages/escape: {}
 
-  packages/fetch:
-    dependencies:
-      '@weapp-core/http':
-        specifier: workspace:^
-        version: link:../http
-
-  packages/http:
-    dependencies:
-      event-target-shim:
-        specifier: ^6.0.2
-        version: 6.0.2
-
   packages/regex: {}
-
-  packages/runtime-injector:
-    dependencies:
-      '@weapp-core/http':
-        specifier: workspace:^
-        version: link:../http
-
-  packages/websocket:
-    dependencies:
-      '@weapp-core/http':
-        specifier: workspace:^
-        version: link:../http
-
-  packages/xmlhttprequest:
-    dependencies:
-      '@weapp-core/http':
-        specifier: workspace:^
-        version: link:../http
 
 packages:
 
@@ -4810,10 +4780,6 @@ packages:
   esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
-
-  event-target-shim@6.0.2:
-    resolution: {integrity: sha512-8q3LsZjRezbFZ2PN+uP+Q7pnHUMmAOziU2vA2OwoFaKIXxlxl38IylhSSgUorWu/rf4er67w0ikBqjBFk/pomA==}
-    engines: {node: '>=10.13.0'}
 
   eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
@@ -13454,8 +13420,6 @@ snapshots:
       '@types/estree': 1.0.9
 
   esutils@2.0.3: {}
-
-  event-target-shim@6.0.2: {}
 
   eventemitter3@4.0.7: {}
 

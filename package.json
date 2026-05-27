@@ -24,7 +24,7 @@
     "lint": "turbo run lint",
     "release": "changeset",
     "publish-packages": "turbo run build lint --filter=@weapp-core/escape && npm run test && changeset version && changeset publish",
-    "sync": "cnpm sync @weapp-core/escape @weapp-core/regex @weapp-core/http @weapp-core/runtime-injector weapp-websocket weapp-xmlhttprequest",
+    "sync": "cnpm sync @weapp-core/escape @weapp-core/regex",
     "script:init": "monorepo init",
     "script:sync": "monorepo sync",
     "script:clean": "monorepo clean",
