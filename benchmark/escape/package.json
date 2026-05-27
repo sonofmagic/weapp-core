@@ -13,7 +13,7 @@
     "escape-5-0-1": "npm:@weapp-core/escape@5.0.1"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
   }
 }
